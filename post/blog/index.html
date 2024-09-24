@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>北航CO上机初体验 // Messmer&#39;s Personal Blog</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.134.3">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Messmer" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="/css/main.min.5b1fcc8902588589c4767187402a3c29f8b8d7a6fdef6d9f8f77045bb0d14fee.css" />
+    
+
+    
+    
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="北航CO上机初体验">
+  <meta name="twitter:description" content="北航CO上机初体验 花了好几个小时总算把个人博客搭好了。至于为什么要搭这个博客，只能说人终究是从众的生物，当你看到那么多6系大佬都有自己的博客，难免会想着自己搭一个。
+此外，有一说一昨天的CO上机真是一场灾难
+考试机制 每周的考试让人回忆起高中的峥嵘岁月，CO作为北航精品课程，处处都体现出了不同于其他课程的威压：
+在新北地下机房上机，禁止携带电子设备，校园卡验明真身 只能使用学校机房电脑（这意味着不能使用任何电子资料） 机房电脑手感极度糟糕1 电脑自带程序相当有限，我的vscode上配置了基础的C环境，有verilog插件和Markdown插件，然而听有些人说他们的vscode连verilog插件都没有，语法不熟悉就直接寄 这次的考试机制是总时长三小时，其中前两个小时纯自己做，最后一个小时发出提示文件，还可以向助教提问，三道题都AC之后可以点击交卷，随后助教就会过来提几个问题（然而我因为交卷太晚助教让我直接走），结束之后就可以离开了。令人惊讶的是这次上机只要在三个小时内AK，课程平台上就一律算通过，于是像我这种三道题全是最后一小时AC的大混子也有个通过标。
+第一题 第一题是一道logisim的MOORE状态机的题目，要求根据输入的不同切换数列的递推方式，这一构造没有什么难度，只要用一个额外的寄存器存储前n项和的值即可。然而这一题最大的难点在于——同步复位！！！
+属于是COpre魅力时刻了，因为COpre上根本没有涉及到同步复位的设计方法，我们之前做的题全部都是异步复位。于是我的设计过程是这样的：
+首先使用异步复位，即直接把reset信号练到寄存器的复位端，四个测试点过两个。 重新审题，发现需要使用同步复位，经过短暂思考，决定把clk信号和reset信号用与门连接在一起，合成同步的reset信号，然后接到寄存器的复位端。四个测试点过三个。 然后我就卡住了（允悲）。 所以问题出在哪呢？原来是因为使用与门会导致毛刺的出现，因为延时的问题，导致clk上升沿到达寄存器和clk和reset的与到达寄存器的时间有了微妙的差异，于是就会出现先正常更新一次数据再突然复位的错误现象。
+那么这个问题如何解决呢？答案是直接放弃寄存器的复位端。直接使用MUX，以reset为选择信号，reset为0时正常输入，为1时则输入初始值。这样就保证复位一定是在clk上升沿进行了。
+先写到这里，第一篇博客，先push一下看看显示正常不。
+黏糊糊，且有奇妙拖拽感的鼠标，不知为何看起来很不清晰的显示屏，敲起来完全不跟手的键盘…… ↩︎">
+
+    <meta property="og:url" content="https://messmerr.github.io/post/blog/">
+  <meta property="og:site_name" content="Messmer&#39;s Personal Blog">
+  <meta property="og:title" content="北航CO上机初体验">
+  <meta property="og:description" content="北航CO上机初体验 花了好几个小时总算把个人博客搭好了。至于为什么要搭这个博客，只能说人终究是从众的生物，当你看到那么多6系大佬都有自己的博客，难免会想着自己搭一个。
+此外，有一说一昨天的CO上机真是一场灾难
+考试机制 每周的考试让人回忆起高中的峥嵘岁月，CO作为北航精品课程，处处都体现出了不同于其他课程的威压：
+在新北地下机房上机，禁止携带电子设备，校园卡验明真身 只能使用学校机房电脑（这意味着不能使用任何电子资料） 机房电脑手感极度糟糕1 电脑自带程序相当有限，我的vscode上配置了基础的C环境，有verilog插件和Markdown插件，然而听有些人说他们的vscode连verilog插件都没有，语法不熟悉就直接寄 这次的考试机制是总时长三小时，其中前两个小时纯自己做，最后一个小时发出提示文件，还可以向助教提问，三道题都AC之后可以点击交卷，随后助教就会过来提几个问题（然而我因为交卷太晚助教让我直接走），结束之后就可以离开了。令人惊讶的是这次上机只要在三个小时内AK，课程平台上就一律算通过，于是像我这种三道题全是最后一小时AC的大混子也有个通过标。
+第一题 第一题是一道logisim的MOORE状态机的题目，要求根据输入的不同切换数列的递推方式，这一构造没有什么难度，只要用一个额外的寄存器存储前n项和的值即可。然而这一题最大的难点在于——同步复位！！！
+属于是COpre魅力时刻了，因为COpre上根本没有涉及到同步复位的设计方法，我们之前做的题全部都是异步复位。于是我的设计过程是这样的：
+首先使用异步复位，即直接把reset信号练到寄存器的复位端，四个测试点过两个。 重新审题，发现需要使用同步复位，经过短暂思考，决定把clk信号和reset信号用与门连接在一起，合成同步的reset信号，然后接到寄存器的复位端。四个测试点过三个。 然后我就卡住了（允悲）。 所以问题出在哪呢？原来是因为使用与门会导致毛刺的出现，因为延时的问题，导致clk上升沿到达寄存器和clk和reset的与到达寄存器的时间有了微妙的差异，于是就会出现先正常更新一次数据再突然复位的错误现象。
+那么这个问题如何解决呢？答案是直接放弃寄存器的复位端。直接使用MUX，以reset为选择信号，reset为0时正常输入，为1时则输入初始值。这样就保证复位一定是在clk上升沿进行了。
+先写到这里，第一篇博客，先push一下看看显示正常不。
+黏糊糊，且有奇妙拖拽感的鼠标，不知为何看起来很不清晰的显示屏，敲起来完全不跟手的键盘…… ↩︎">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2024-09-24T12:10:01+08:00">
+    <meta property="article:modified_time" content="2024-09-24T12:10:01+08:00">
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://messmerr.github.io/"><img class="app-header-avatar" src="/avatar.jpg" alt="Messmer" /></a>
+      <span class="app-header-title">Messmer&#39;s Personal Blog</span>
+      <nav class="app-header-menu">
+          <a class="app-header-menu-item" href="/">Home</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/tags/">Tags</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/about/">About</a>
+      </nav>
+      <p>正在悲惨地死磕计组</p>
+      <div class="app-header-social">
+        
+          <a href="https://github.com/messmerr" target="_blank" rel="noreferrer noopener me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
+  <title>Github</title>
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+</svg>
+          </a>
+        
+          <a href="https://twitter.com/gohugoio" target="_blank" rel="noreferrer noopener me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-twitter">
+  <title>Twitter</title>
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+</svg>
+          </a>
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">北航CO上机初体验</h1>
+      <div class="post-meta">
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Sep 24, 2024
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          1 min read
+        </div>
+      </div>
+    </header>
+    <div class="post-content">
+      <h1 id="北航co上机初体验">北航CO上机初体验</h1>
+<hr>
+<p>花了好几个小时总算把<strong>个人博客</strong>搭好了。至于为什么要搭这个博客，只能说人终究是从众的生物，当你看到那么多<strong>6系大佬</strong>都有自己的博客，难免会想着自己搭一个。</p>
+<p>此外，有一说一昨天的<strong>CO上机</strong>真是一场灾难</p>
+<h3 id="考试机制">考试机制</h3>
+<p>每周的考试让人回忆起高中的峥嵘岁月，CO作为北航精品课程，处处都体现出了不同于其他课程的威压：</p>
+<ul>
+<li><strong>在新北地下机房上机，禁止携带电子设备，校园卡验明真身</strong></li>
+<li><strong>只能使用学校机房电脑</strong>（这意味着不能使用任何电子资料）</li>
+<li><strong>机房电脑手感极度糟糕<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></strong></li>
+<li><strong>电脑自带程序相当有限，我的vscode上配置了基础的C环境，有verilog插件和Markdown插件，然而听有些人说他们的vscode连verilog插件都没有，语法不熟悉就直接寄</strong></li>
+</ul>
+<p>这次的考试机制是总时长<strong>三小时</strong>，其中前两个小时纯自己做，最后一个小时发出提示文件，还可以向助教提问，<strong>三道题都AC之后</strong>可以点击交卷，随后助教就会过来提几个问题（<em>然而我因为交卷太晚助教让我直接走</em>），结束之后就可以离开了。令人惊讶的是这次上机只要在三个小时内AK，<strong>课程平台上就一律算通过</strong>，于是像我这种三道题全是最后一小时AC的大混子也有个通过标。</p>
+<p><img src="../../images/blog/image.png" alt="alt text"></p>
+<h3 id="第一题">第一题</h3>
+<p>第一题是一道logisim的<strong>MOORE状态机</strong>的题目，要求根据输入的不同切换数列的递推方式，这一构造没有什么难度，只要用一个额外的寄存器存储前n项和的值即可。然而这一题最大的难点在于——<strong>同步复位！！！</strong></p>
+<p>属于是<strong>COpre魅力时刻</strong>了，因为COpre上根本没有涉及到同步复位的设计方法，我们之前做的题全部都是异步复位。于是我的设计过程是这样的：</p>
+<ol>
+<li>首先使用<strong>异步复位</strong>，即直接把reset信号练到寄存器的复位端，<strong>四个测试点过两个</strong>。</li>
+<li>重新审题，发现需要使用<strong>同步复位</strong>，经过短暂思考，决定把<strong>clk信号和reset信号</strong>用<strong>与门</strong>连接在一起，合成同步的reset信号，然后接到寄存器的复位端。<strong>四个测试点过三个</strong>。</li>
+<li><strong>然后我就卡住了（允悲）</strong>。</li>
+</ol>
+<p>所以问题出在哪呢？原来是因为使用与门会导致<strong>毛刺</strong>的出现，因为延时的问题，导致clk上升沿到达寄存器和clk和reset的与到达寄存器的时间有了<strong>微妙的差异</strong>，于是就会出现先正常更新一次数据再突然复位的错误现象。</p>
+<p>那么这个问题如何解决呢？答案是<strong>直接放弃寄存器的复位端</strong>。直接<strong>使用MUX</strong>，以reset为选择信号，reset为0时正常输入，为1时则输入初始值。这样就保证<strong>复位一定是在clk上升沿进行</strong>了。</p>
+<p><em>先写到这里，第一篇博客，先push一下看看显示正常不。</em></p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>黏糊糊，且有奇妙拖拽感的鼠标，不知为何看起来很不清晰的显示屏，敲起来完全不跟手的键盘……&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>
