@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Messmer&#39;s Personal Blog</title>
-    <link>https://example.com/</link>
+    <link>https://messmerr.github.io/</link>
     <description>Recent content on Messmer&#39;s Personal Blog</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Tue, 24 Sep 2024 12:10:01 +0800</lastBuildDate>
-    <atom:link href="https://example.com/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://messmerr.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Blog</title>
-      <link>https://example.com/post/blog/</link>
+      <title>北航CO上机初体验</title>
+      <link>https://messmerr.github.io/post/blog/</link>
       <pubDate>Tue, 24 Sep 2024 12:10:01 +0800</pubDate>
-      <guid>https://example.com/post/blog/</guid>
-      <description>&lt;h1 id=&#34;fuck-co&#34;&gt;FUCK CO&lt;/h1&gt;</description>
+      <guid>https://messmerr.github.io/post/blog/</guid>
+      <description>&lt;h1 id=&#34;北航co上机初体验&#34;&gt;北航CO上机初体验&lt;/h1&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;花了好几个小时总算把&lt;strong&gt;个人博客&lt;/strong&gt;搭好了。至于为什么要搭这个博客，只能说人终究是从众的生物，当你看到那么多&lt;strong&gt;6系大佬&lt;/strong&gt;都有自己的博客，难免会想着自己搭一个。&lt;/p&gt;&#xA;&lt;p&gt;此外，有一说一昨天的&lt;strong&gt;CO上机&lt;/strong&gt;真是一场灾难&lt;/p&gt;&#xA;&lt;h3 id=&#34;考试机制&#34;&gt;考试机制&lt;/h3&gt;&#xA;&lt;p&gt;每周的考试让人回忆起高中的峥嵘岁月，CO作为北航精品课程，处处都体现出了不同于其他课程的威压：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;在新北地下机房上机，禁止携带电子设备，校园卡验明真身&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;只能使用学校机房电脑&lt;/strong&gt;（这意味着不能使用任何电子资料）&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;机房电脑手感极度糟糕&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;电脑自带程序相当有限，我的vscode上配置了基础的C环境，有verilog插件和Markdown插件，然而听有些人说他们的vscode连verilog插件都没有，语法不熟悉就直接寄&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;这次的考试机制是总时长&lt;strong&gt;三小时&lt;/strong&gt;，其中前两个小时纯自己做，最后一个小时发出提示文件，还可以向助教提问，&lt;strong&gt;三道题都AC之后&lt;/strong&gt;可以点击交卷，随后助教就会过来提几个问题（&lt;em&gt;然而我因为交卷太晚助教让我直接走&lt;/em&gt;），结束之后就可以离开了。令人惊讶的是这次上机只要在三个小时内AK，&lt;strong&gt;课程平台上就一律算通过&lt;/strong&gt;，于是像我这种三道题全是最后一小时AC的大混子也有个通过标。&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;image.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;&#xA;&lt;h3 id=&#34;第一题&#34;&gt;第一题&lt;/h3&gt;&#xA;&lt;p&gt;第一题是一道logisim的&lt;strong&gt;MOORE状态机&lt;/strong&gt;的题目，要求根据输入的不同切换数列的递推方式，这一构造没有什么难度，只要用一个额外的寄存器存储前n项和的值即可。然而这一题最大的难点在于——&lt;strong&gt;同步复位！！！&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;属于是&lt;strong&gt;COpre魅力时刻&lt;/strong&gt;了，因为COpre上根本没有涉及到同步复位的设计方法，我们之前做的题全部都是异步复位。于是我的设计过程是这样的：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;首先使用&lt;strong&gt;异步复位&lt;/strong&gt;，即直接把reset信号练到寄存器的复位端，&lt;strong&gt;四个测试点过两个&lt;/strong&gt;。&lt;/li&gt;&#xA;&lt;li&gt;重新审题，发现需要使用&lt;strong&gt;同步复位&lt;/strong&gt;，经过短暂思考，决定把&lt;strong&gt;clk信号和reset信号&lt;/strong&gt;用&lt;strong&gt;与门&lt;/strong&gt;连接在一起，合成同步的reset信号，然后接到寄存器的复位端。&lt;strong&gt;四个测试点过三个&lt;/strong&gt;。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;然后我就卡住了（允悲）&lt;/strong&gt;。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;所以问题出在哪呢？原来是因为使用与门会导致&lt;strong&gt;毛刺&lt;/strong&gt;的出现，因为延时的问题，导致clk上升沿到达寄存器和clk和reset的与到达寄存器的时间有了&lt;strong&gt;微妙的差异&lt;/strong&gt;，于是就会出现先正常更新一次数据再突然复位的错误现象。&lt;/p&gt;&#xA;&lt;p&gt;那么这个问题如何解决呢？答案是&lt;strong&gt;直接放弃寄存器的复位端&lt;/strong&gt;。直接&lt;strong&gt;使用MUX&lt;/strong&gt;，以reset为选择信号，reset为0时正常输入，为1时则输入初始值。这样就保证&lt;strong&gt;复位一定是在clk上升沿进行&lt;/strong&gt;了。&lt;/p&gt;&#xA;&lt;p&gt;&lt;em&gt;先写到这里，第一篇博客，先push一下看看显示正常不。&lt;/em&gt;&lt;/p&gt;&#xA;&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;&#xA;&lt;hr&gt;&#xA;&lt;ol&gt;&#xA;&lt;li id=&#34;fn:1&#34;&gt;&#xA;&lt;p&gt;黏糊糊，且有奇妙拖拽感的鼠标，不知为何看起来很不清晰的显示屏，敲起来完全不跟手的键盘……&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;/div&gt;</description>
     </item>
   </channel>
 </rss>
