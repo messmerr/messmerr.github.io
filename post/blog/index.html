@@ -115,7 +115,7 @@
 <li><strong>电脑自带程序相当有限，我的vscode上配置了基础的C环境，有verilog插件和Markdown插件，然而听有些人说他们的vscode连verilog插件都没有，语法不熟悉就直接寄</strong></li>
 </ul>
 <p>这次的考试机制是总时长<strong>三小时</strong>，其中前两个小时纯自己做，最后一个小时发出提示文件，还可以向助教提问，<strong>三道题都AC之后</strong>可以点击交卷，随后助教就会过来提几个问题（<em>然而我因为交卷太晚助教让我直接走</em>），结束之后就可以离开了。令人惊讶的是这次上机只要在三个小时内AK，<strong>课程平台上就一律算通过</strong>，于是像我这种三道题全是最后一小时AC的大混子也有个通过标。</p>
-<p><img src="image.png" alt="alt text"></p>
+<p><img src="../../static/blog/image.png" alt="alt text"></p>
 <h3 id="第一题">第一题</h3>
 <p>第一题是一道logisim的<strong>MOORE状态机</strong>的题目，要求根据输入的不同切换数列的递推方式，这一构造没有什么难度，只要用一个额外的寄存器存储前n项和的值即可。然而这一题最大的难点在于——<strong>同步复位！！！</strong></p>
 <p>属于是<strong>COpre魅力时刻</strong>了，因为COpre上根本没有涉及到同步复位的设计方法，我们之前做的题全部都是异步复位。于是我的设计过程是这样的：</p>
