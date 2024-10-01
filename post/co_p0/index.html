@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <title>北航CO_P0课上——logisim的基础运用 // Messmer&#39;s Personal Blog</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.134.3">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Messmer" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="/css/main.min.5b1fcc8902588589c4767187402a3c29f8b8d7a6fdef6d9f8f77045bb0d14fee.css" />
+    
+
+    
+    
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="北航CO_P0课上——logisim的基础运用">
+  <meta name="twitter:description" content=" 昨天晚上进行了计组P0的上机，他不是普通的上机，是国庆前夜的上机，是计组第一次影响分数的上机，这里除了6系牛马，没人配与他单挑。
+在去之前，我是十分焦虑的。这主要是北航CO的低容错所致：
+课程总计5.5学分，分为理论和实验两部分，其中实验部分占比超过2学分。 实验部分以课上为主，课上部分采取闯关制，只有通过前面的关卡才能继续挑战后面的关卡。例如你P5挂了，下一次上机别人做P6，你还是做P5，而且你并不是接着上一周的进度做，助教出了全新的三道题（快说谢谢助教），要是这次还不过，那下次继续。 根据往届的说法，前几次上机通过的要求都是AK,必须三道题全过，后面则会变成过两道即算通过。 上机难度通常不低，即使是那些公认的往届大佬都有不少挂过。 不过课程组也知道不能太为难学生，所以还是有一些保护措施，比如前几次上机不做卡关设置，没过也允许做后面的内容（我觉得这可能跟前几次上机不涉及迭代开发有关）。此外，据说再过几周会有一次整体的容错关，大家一起停一周，全过的同学无事可做，剩下的同学可以追一次进度。相当于提供了挂一次的容错。
+但是毫无疑问，即便如此上机依然是一个让人无比焦虑的事情，想想看，可能一个思路没转过来，就挂了一次上机，然后直接被大部队甩开，要是在同一关挂两次以上，那简直重开的心都有了。
+幸运的是，这次的P0是一个纯粹的奖励关。
+情况 我们寝室四个人都在开考后四十分钟至一个小时间AK交卷。同时，我交卷的时候仅我所在机房就有二十几个人排队在我前面等待签退，可见课程组发自内心的想让我们度过一个快乐的国庆。
+而且我们还发糖吃了，win。
+第一题 一道非常简单的组合逻辑的题目。要求计算一个四位四进制数的逆序数。
+在n个数码1，2，…，n的全排列j1j2…jn中，若一个较大的数码排在一个较小的数码的前面，则称它们构成逆序，这个排列的所有逆序的数量，称为这个排列的逆序数，记为τ(j1j2…jn)或π(j1j2…jn)。例如，在四个数码的排列3142中，3与1，3与2以及4与2都构成逆序，因此τ(3142)=3。逆序数为奇数的排列称为奇排列，逆序数为偶数的排列称为偶排列。">
+
+    <meta property="og:url" content="http://localhost:1313/post/co_p0/">
+  <meta property="og:site_name" content="Messmer&#39;s Personal Blog">
+  <meta property="og:title" content="北航CO_P0课上——logisim的基础运用">
+  <meta property="og:description" content=" 昨天晚上进行了计组P0的上机，他不是普通的上机，是国庆前夜的上机，是计组第一次影响分数的上机，这里除了6系牛马，没人配与他单挑。
+在去之前，我是十分焦虑的。这主要是北航CO的低容错所致：
+课程总计5.5学分，分为理论和实验两部分，其中实验部分占比超过2学分。 实验部分以课上为主，课上部分采取闯关制，只有通过前面的关卡才能继续挑战后面的关卡。例如你P5挂了，下一次上机别人做P6，你还是做P5，而且你并不是接着上一周的进度做，助教出了全新的三道题（快说谢谢助教），要是这次还不过，那下次继续。 根据往届的说法，前几次上机通过的要求都是AK,必须三道题全过，后面则会变成过两道即算通过。 上机难度通常不低，即使是那些公认的往届大佬都有不少挂过。 不过课程组也知道不能太为难学生，所以还是有一些保护措施，比如前几次上机不做卡关设置，没过也允许做后面的内容（我觉得这可能跟前几次上机不涉及迭代开发有关）。此外，据说再过几周会有一次整体的容错关，大家一起停一周，全过的同学无事可做，剩下的同学可以追一次进度。相当于提供了挂一次的容错。
+但是毫无疑问，即便如此上机依然是一个让人无比焦虑的事情，想想看，可能一个思路没转过来，就挂了一次上机，然后直接被大部队甩开，要是在同一关挂两次以上，那简直重开的心都有了。
+幸运的是，这次的P0是一个纯粹的奖励关。
+情况 我们寝室四个人都在开考后四十分钟至一个小时间AK交卷。同时，我交卷的时候仅我所在机房就有二十几个人排队在我前面等待签退，可见课程组发自内心的想让我们度过一个快乐的国庆。
+而且我们还发糖吃了，win。
+第一题 一道非常简单的组合逻辑的题目。要求计算一个四位四进制数的逆序数。
+在n个数码1，2，…，n的全排列j1j2…jn中，若一个较大的数码排在一个较小的数码的前面，则称它们构成逆序，这个排列的所有逆序的数量，称为这个排列的逆序数，记为τ(j1j2…jn)或π(j1j2…jn)。例如，在四个数码的排列3142中，3与1，3与2以及4与2都构成逆序，因此τ(3142)=3。逆序数为奇数的排列称为奇排列，逆序数为偶数的排列称为偶排列。">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2024-10-01T17:14:57+08:00">
+    <meta property="article:modified_time" content="2024-10-01T17:14:57+08:00">
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="http://localhost:1313/"><img class="app-header-avatar" src="/avatar.jpg" alt="Messmer" /></a>
+      <span class="app-header-title">Messmer&#39;s Personal Blog</span>
+      <nav class="app-header-menu">
+          <a class="app-header-menu-item" href="/">Home</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/tags/">Tags</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/about/">About</a>
+      </nav>
+      <p>正在悲惨地死磕计组</p>
+      <div class="app-header-social">
+        
+          <a href="https://github.com/messmerr" target="_blank" rel="noreferrer noopener me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
+  <title>Github</title>
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+</svg>
+          </a>
+        
+          <a href="https://twitter.com/gohugoio" target="_blank" rel="noreferrer noopener me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-twitter">
+  <title>Twitter</title>
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+</svg>
+          </a>
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">北航CO_P0课上——logisim的基础运用</h1>
+      <div class="post-meta">
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Oct 1, 2024
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          1 min read
+        </div>
+      </div>
+    </header>
+    <div class="post-content">
+      <hr>
+<p>昨天晚上进行了<strong>计组P0</strong>的上机，<strong>他不是普通的上机，是国庆前夜的上机，是计组第一次影响分数的上机，这里除了6系牛马，没人配与他单挑。</strong></p>
+<p>在去之前，我是十分焦虑的。这主要是<strong>北航CO</strong>的低容错所致：</p>
+<ul>
+<li>课程总计<strong>5.5学分</strong>，分为<strong>理论和实验</strong>两部分，其中实验部分占比超过<strong>2学分</strong>。</li>
+<li>实验部分以课上为主，课上部分采取<strong>闯关制</strong>，只有通过前面的关卡才能继续挑战后面的关卡。例如你P5挂了，下一次上机别人做P6，你还是做P5，而且你并不是接着上一周的进度做，助教出了<strong>全新的三道题（快说谢谢助教）</strong>，要是这次还不过，那<strong>下次继续</strong>。</li>
+<li>根据往届的说法，前几次上机通过的要求<strong>都是AK</strong>,必须<strong>三道题全过</strong>，后面则会变成<strong>过两道即算通过</strong>。</li>
+<li>上机难度通常不低，即使是<strong>那些公认的往届大佬都有不少挂过</strong>。</li>
+</ul>
+<p>不过课程组也知道不能太为难学生，所以还是有一些<strong>保护措施</strong>，比如前几次上机不做卡关设置，<strong>没过也允许做后面的内容</strong>（我觉得这可能跟前几次上机不涉及迭代开发有关）。此外，据说再过几周会有一次整体的容错关，大家一起停一周，全过的同学无事可做，剩下的同学可以追一次进度。<strong>相当于提供了挂一次的容错。</strong></p>
+<p>但是毫无疑问，即便如此上机依然是一个让人无比焦虑的事情，想想看，可能一个思路没转过来，就挂了一次上机，然后直接被大部队甩开，要是在同一关挂两次以上，那简直重开的心都有了。</p>
+<p>幸运的是，这次的P0是一个<strong>纯粹的奖励关</strong>。</p>
+<h3 id="情况">情况</h3>
+<p>我们寝室四个人都在开考后<strong>四十分钟至一个小时</strong>间AK交卷。同时，我交卷的时候仅我所在机房就有二十几个人排队在我前面等待签退，可见<strong>课程组</strong>发自内心的想让我们度过一个<strong>快乐的国庆</strong>。</p>
+<p><strong>而且我们还发糖吃了，win。</strong></p>
+<h3 id="第一题">第一题</h3>
+<p>一道非常简单的组合逻辑的题目。要求计算一个四位四进制数的逆序数。</p>
+<blockquote>
+<p>在n个数码1，2，…，n的全排列j<!-- raw HTML omitted -->1<!-- raw HTML omitted -->j<!-- raw HTML omitted -->2<!-- raw HTML omitted -->…j<!-- raw HTML omitted -->n<!-- raw HTML omitted -->中，若一个较大的数码排在一个较小的数码的前面，则称它们构成逆序，这个排列的所有逆序的数量，称为这个排列的逆序数，记为τ(j<!-- raw HTML omitted -->1<!-- raw HTML omitted -->j<!-- raw HTML omitted -->2<!-- raw HTML omitted -->…j<!-- raw HTML omitted -->n<!-- raw HTML omitted -->)或π(j<!-- raw HTML omitted -->1<!-- raw HTML omitted -->j<!-- raw HTML omitted -->2<!-- raw HTML omitted -->…j<!-- raw HTML omitted -->n<!-- raw HTML omitted -->)。例如，在四个数码的排列3142中，3与1，3与2以及4与2都构成逆序，因此τ(3142)=3。逆序数为奇数的排列称为奇排列，逆序数为偶数的排列称为偶排列。</p>
+</blockquote>
+<p>这道题的思路连小学生看了上面的定义都知道，只需要从前往后依次比较六次，每次出现前大于后时加一即可。唯一可能需要注意的点就是比较器要设置为unsigned。</p>
+<h3 id="第二题">第二题</h3>
+<p>一道非常简单的MOORE状态机的题目，只需要根据指令对两个寄存器进行简单的运算，00不变，01加1，10减1，11置0。有一个输入信号决定操作哪个寄存器。唯一需要注意的是操作一个寄存器时要保证另一个不变，这一点用使能端实现即可。</p>
+<h3 id="第三题">第三题</h3>
+<p>一道简单的MOORE状态机的题目，需要输出由“0-9，a-f”构成的最长严格递增后缀子串的长度。</p>
+<blockquote>
+<p>例如，串abcdefg的后缀子串包括g,fg,efg,defg,cdefg,bcdefg,abcdefg。若一个后缀子串满足每一个数都比之前的数大，则称其为严格递增后缀子串。</p>
+</blockquote>
+<p>我的方法是使用两个寄存器，一个存储上一个数的值，另一个存储最长严格递增后缀子串的长度。状态更新非常简单，略而不表。</p>
+
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>
