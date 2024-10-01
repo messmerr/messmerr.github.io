@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>CO on Messmerr&#39;s Personal Blog</title>
-        <link>https://messmerr.github.io/categories/co/</link>
+        <link>http://localhost:1313/categories/co/</link>
         <description>Recent content in CO on Messmerr&#39;s Personal Blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>Messmerr</copyright>
-        <lastBuildDate>Tue, 01 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://messmerr.github.io/categories/co/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 01 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/co/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>北航CO课上——logisim的基础运用</title>
-        <link>https://messmerr.github.io/p/test-chinese/</link>
+        <link>http://localhost:1313/p/test-chinese/</link>
         <pubDate>Tue, 01 Oct 2024 00:00:00 +0000</pubDate>
         
-        <guid>https://messmerr.github.io/p/test-chinese/</guid>
+        <guid>http://localhost:1313/p/test-chinese/</guid>
         <description>&lt;p&gt;昨天晚上进行了&lt;strong&gt;计组P0&lt;/strong&gt;的上机，&lt;strong&gt;他不是普通的上机，是国庆前夜的上机，是计组第一次影响分数的上机，这里除了6系牛马，没人配与他单挑。&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;在去之前，我是十分焦虑的。这主要是&lt;strong&gt;北航CO&lt;/strong&gt;的低容错所致：&lt;/p&gt;
 &lt;ul&gt;
@@ -45,10 +45,10 @@
         </item>
         <item>
         <title>北航CO_P0课下——FSM</title>
-        <link>https://messmerr.github.io/p/test-chinese/</link>
+        <link>http://localhost:1313/p/test-chinese/</link>
         <pubDate>Thu, 26 Sep 2024 00:00:00 +0000</pubDate>
         
-        <guid>https://messmerr.github.io/p/test-chinese/</guid>
+        <guid>http://localhost:1313/p/test-chinese/</guid>
         <description>&lt;hr&gt;
 &lt;h1 id=&#34;fsm&#34;&gt;FSM
 &lt;/h1&gt;&lt;p&gt;这一题题干是检测是否输入的字符串是否符合给定的格式。&lt;/p&gt;
@@ -93,12 +93,11 @@
         </item>
         <item>
         <title>北航CO上机初体验</title>
-        <link>https://messmerr.github.io/p/test-chinese/</link>
+        <link>http://localhost:1313/p/test-chinese/</link>
         <pubDate>Tue, 24 Sep 2024 00:00:00 +0000</pubDate>
         
-        <guid>https://messmerr.github.io/p/test-chinese/</guid>
-        <description>&lt;hr&gt;
-&lt;p&gt;花了好几个小时总算把&lt;strong&gt;个人博客&lt;/strong&gt;搭好了。至于为什么要搭这个博客，只能说人终究是从众的生物，当你看到那么多&lt;strong&gt;6系大佬&lt;/strong&gt;都有自己的博客，难免会想着自己搭一个。&lt;/p&gt;
+        <guid>http://localhost:1313/p/test-chinese/</guid>
+        <description>&lt;p&gt;花了好几个小时总算把&lt;strong&gt;个人博客&lt;/strong&gt;搭好了。至于为什么要搭这个博客，只能说人终究是从众的生物，当你看到那么多&lt;strong&gt;6系大佬&lt;/strong&gt;都有自己的博客，难免会想着自己搭一个。&lt;/p&gt;
 &lt;p&gt;此外，有一说一昨天的&lt;strong&gt;CO上机&lt;/strong&gt;真是一场灾难&lt;/p&gt;
 &lt;h3 id=&#34;考试机制&#34;&gt;考试机制
 &lt;/h3&gt;&lt;p&gt;每周的考试让人回忆起高中的峥嵘岁月，CO作为北航精品课程，处处都体现出了不同于其他课程的威压：&lt;/p&gt;
@@ -109,7 +108,7 @@
 &lt;li&gt;&lt;strong&gt;电脑自带程序相当有限，我的vscode上配置了基础的C环境，有verilog插件和Markdown插件，然而听有些人说他们的vscode连verilog插件都没有，语法不熟悉就直接寄&lt;/strong&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;这次的考试机制是总时长&lt;strong&gt;三小时&lt;/strong&gt;，其中前两个小时纯自己做，最后一个小时发出提示文件，还可以向助教提问，&lt;strong&gt;三道题都AC之后&lt;/strong&gt;可以点击交卷，随后助教就会过来提几个问题（&lt;em&gt;然而我因为交卷太晚助教让我直接走&lt;/em&gt;），结束之后就可以离开了。令人惊讶的是这次上机只要在三个小时内AK，&lt;strong&gt;课程平台上就一律算通过&lt;/strong&gt;，于是像我这种三道题全是最后一小时AC的大混子也有个通过标。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://messmerr.github.io/images/blog/image.png&#34;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/blog/image.png&#34;
 	
 	
 	
