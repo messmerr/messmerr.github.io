@@ -7,7 +7,472 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>Messmerr</copyright>
-        <lastBuildDate>Tue, 01 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://messmerr.github.io/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Wed, 23 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://messmerr.github.io/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>北航CO_P3-logisim搭建单周期CPU</title>
+        <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</link>
+        <pubDate>Wed, 23 Oct 2024 00:00:00 +0000</pubDate>
+        
+        <guid>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</guid>
+        <description>&lt;img src="https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/pexels-jplenio-1105379.jpg" alt="Featured image of post 北航CO_P3-logisim搭建单周期CPU" /&gt;&lt;hr&gt;
+&lt;h1 id=&#34;单周期cpu设计方案&#34;&gt;单周期CPU设计方案
+&lt;/h1&gt;&lt;h2 id=&#34;概述&#34;&gt;概述
+&lt;/h2&gt;&lt;p&gt;本文使用logisim搭建了一个支持八条指令的MIPS架构CPU。开发过程首先分析所需指令的RTL，抽象出所需要的功能。然后分别建模并实现恰当的功能部件。再根据不同指令之间的关系合理地组建出简洁的数据通路。最后通过构建真值表构造控制器。&lt;/p&gt;
+&lt;h2 id=&#34;指令说明&#34;&gt;指令说明
+&lt;/h2&gt;&lt;p&gt;本文实现的CPU只包含题目要求的8条指令，但笔者在使用时进行了一些操作以增强可扩展性，下文会在相应位置介绍。&lt;/p&gt;
+&lt;h3 id=&#34;r型指令&#34;&gt;R型指令
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;add&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sub&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;实际上实现的指令相当于&lt;code&gt;addu&lt;/code&gt;和&lt;code&gt;subu&lt;/code&gt;，因为题目明确指出不考虑溢出&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;i型指令&#34;&gt;I型指令
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ori&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;lw&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sw&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;beq&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;lui&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;空指令&#34;&gt;空指令
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;nop&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;模块设计&#34;&gt;模块设计
+&lt;/h2&gt;&lt;h3 id=&#34;pc&#34;&gt;PC
+&lt;/h3&gt;&lt;p&gt;就是一个32位寄存器，没什么特别设计的。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;Clk&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;reset&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;DI&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;DO&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;npc&#34;&gt;NPC
+&lt;/h3&gt;&lt;p&gt;用组合逻辑计算出下一个指令的地址，通常是变为&lt;code&gt;PC+4&lt;/code&gt;。对于跳转指令，本文只包含一个beq，但笔者为jal和jr留出了对应的接口。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;PC&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;imm16&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;16&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;imm26&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;26&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;A32&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;NPCOp&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;2&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;Zero&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;NPC&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;grf&#34;&gt;GRF
+&lt;/h3&gt;&lt;p&gt;寄存器堆，之前在P0已经设计过了。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;Clk&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;WE&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;reset&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;WD&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;A1&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;5&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;A2&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;5&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;A3&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;5&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;RD1&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;RD2&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;im&#34;&gt;IM
+&lt;/h3&gt;&lt;p&gt;指令存储器，使用ROM实现，此前我因为审题不仔细导致这里卡了很久。要注意ROM的地址是以一个字为单位而不是字节，也就是说两个指令在mars中显示的地址是相隔4，用ROM表示其实只相隔1.&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;A&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;12&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;D&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;dm&#34;&gt;DM
+&lt;/h3&gt;&lt;p&gt;数据存储器，用RAM实现。与指令存储器相比只多了一个写数据的功能。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;Clk&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;Wr&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;A&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;10&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;DI&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;DO&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;alu&#34;&gt;ALU
+&lt;/h3&gt;&lt;p&gt;本文需要的指令只用得到四个运算：加、减、或和判断相等。其中等于可以用减来完成，减可以用补码来简化。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;a&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;b&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;op&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;2&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;c&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;组建数据通路&#34;&gt;组建数据通路
+&lt;/h2&gt;&lt;h3 id=&#34;取指令&#34;&gt;取指令
+&lt;/h3&gt;&lt;p&gt;PC与NPC实际上组成了一个MOORE型状态机，除这两个模块的所有部分都可以看成转移电路。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;图是gxp老师课件上的，实际电路NPC应该有几根线&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image.png&#34;
+	width=&#34;259&#34;
+	height=&#34;205&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu1257119938015792967.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu17176869396698944874.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;126&#34;
+		data-flex-basis=&#34;303px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;指令分解&#34;&gt;指令分解
+&lt;/h3&gt;&lt;p&gt;纯粹体力劳动，把所有可能出现的指令部分全部分离出来。
+&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-1.png&#34;
+	width=&#34;447&#34;
+	height=&#34;263&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-1_hu8684917992346940111.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-1_hu8989696047024708657.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;169&#34;
+		data-flex-basis=&#34;407px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;addu--subu&#34;&gt;ADDU &amp;amp; SUBU
+&lt;/h3&gt;&lt;p&gt;最基础的指令，其他指令基本都是通过扩充这一部分的电路。
+电路中rs、rt、rd分别给出读写指令，将运算的结果写入rd对应的寄存器中。
+&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-2.png&#34;
+	width=&#34;375&#34;
+	height=&#34;235&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-2_hu9688860742562248011.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-2_hu9898298850582058437.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;159&#34;
+		data-flex-basis=&#34;382px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;ori&#34;&gt;ORI
+&lt;/h3&gt;&lt;p&gt;这一段稍微需要注意一下RTL。
+&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/98d4648655182408d1449d73a0d1de9.png&#34;
+	width=&#34;859&#34;
+	height=&#34;364&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/98d4648655182408d1449d73a0d1de9_hu6089035281481330811.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/98d4648655182408d1449d73a0d1de9_hu15143189203310304875.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;235&#34;
+		data-flex-basis=&#34;566px&#34;
+	
+&gt;
+由RTL知，我们要把立即数imm16作零扩展到32位后再参与或运算。同时，注意到这里需要输入GRF和ALU模块的信号与上面不同。rt作为了被写入的寄存器，同时进行运算的一个寄存器被换成了立即数。所以要在A3和B接口前使用MUX进行信号选择。每一次出现这类情况我们都用一个标签作为控制信号，最后使用打表方式一次性生成各指令的控制信号。
+&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-3.png&#34;
+	width=&#34;425&#34;
+	height=&#34;334&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-3_hu7305957060314092148.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-3_hu8727959061812780460.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;127&#34;
+		data-flex-basis=&#34;305px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;lw&#34;&gt;LW
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-4.png&#34;
+	width=&#34;1068&#34;
+	height=&#34;378&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-4_hu6443185353931928984.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-4_hu9297083337520267099.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;282&#34;
+		data-flex-basis=&#34;678px&#34;
+	
+&gt;
+首次出现了要对DM进行操作的指令。此时ALU的输出作为读DM的地址，DM的输出被写入对应寄存器中。此外，这里需要对立即数imm16进行的是有符号扩展，所以对EXT也要进行信号选择。
+&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-5.png&#34;
+	width=&#34;468&#34;
+	height=&#34;328&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-5_hu8867463498713777001.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-5_hu7130255315357254439.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;142&#34;
+		data-flex-basis=&#34;342px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;sw&#34;&gt;SW
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/2e7fa4342d573f3942ad6a7ca10dded.png&#34;
+	width=&#34;1102&#34;
+	height=&#34;462&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/2e7fa4342d573f3942ad6a7ca10dded_hu14048915399541119807.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/2e7fa4342d573f3942ad6a7ca10dded_hu15226301040041250481.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;238&#34;
+		data-flex-basis=&#34;572px&#34;
+	
+&gt;
+写入而非读取，只需要加一个输入的数据信号和读/写控制信号即可。
+&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-6.png&#34;
+	width=&#34;495&#34;
+	height=&#34;339&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-6_hu12203084715352990761.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-6_hu8306275428917290872.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;146&#34;
+		data-flex-basis=&#34;350px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;beq&#34;&gt;BEQ
+&lt;/h3&gt;&lt;p&gt;这一部分的逻辑主要是在NPC中完成的，此外只需要利用ALU的减法产生一个判断A、B是否相等的信号即可。
+&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-7.png&#34;
+	width=&#34;490&#34;
+	height=&#34;337&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-7_hu6149330859689517399.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-7_hu13825922559627414455.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;145&#34;
+		data-flex-basis=&#34;348px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;lui&#34;&gt;LUI
+&lt;/h3&gt;&lt;p&gt;唯一老师上课没讲的指令，所以白嫖不了结构图了（悲伤）。
+&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/1a301a36ed4a4c9039f80669e96792d.png&#34;
+	width=&#34;979&#34;
+	height=&#34;382&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/1a301a36ed4a4c9039f80669e96792d_hu1283075729208184123.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/1a301a36ed4a4c9039f80669e96792d_hu549884947335130086.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;256&#34;
+		data-flex-basis=&#34;615px&#34;
+	
+&gt;
+但实现非常简单，笔者将imm16拼接了一个16h&#39;0的信号，然后直接连到GRF的WD端，配合MUX和控制信号即可。&lt;/p&gt;
+&lt;h2 id=&#34;控制信号&#34;&gt;控制信号
+&lt;/h2&gt;&lt;p&gt;为了使控制电路便于阅读和debug，我们使用或逻辑搭建电路，这样使得连线的目的非常明确。生成控制信号也许是最重要的一步，因为这一步很容易粗心。笔者就连错了一条。这里直接把我做的电路放上来。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;有人可能会问和逻辑呢？因为我用的是比较器所以省略掉了hhh
+跟上面的信号名不完全一样，仅供参考。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-8.png&#34;
+	width=&#34;1878&#34;
+	height=&#34;1171&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-8_hu14412514712159542525.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-8_hu9092032242994337340.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;160&#34;
+		data-flex-basis=&#34;384px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>北航CO_P0课上——logisim的基础运用</title>
         <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Alogisim%E7%9A%84%E5%9F%BA%E7%A1%80%E8%BF%90%E7%94%A8/</link>
         <pubDate>Tue, 01 Oct 2024 00:00:00 +0000</pubDate>

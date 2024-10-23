@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content=" 单周期CPU设计方案 概述 本文使用logisim搭建了一个支持八条指令的MIPS架构CPU。开发过程首先分析所需指令的RTL，抽象出所需要的功能。然后分别建模并实现恰当的功能部件。再根据不同指令之间的关系合理地组建出简洁的数据通路。最后通过构建真值表构造控制器。\n">
+<title>北航CO_P3-logisim搭建单周期CPU</title>
+
+<link rel='canonical' href='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="北航CO_P3-logisim搭建单周期CPU">
+<meta property='og:description' content=" 单周期CPU设计方案 概述 本文使用logisim搭建了一个支持八条指令的MIPS架构CPU。开发过程首先分析所需指令的RTL，抽象出所需要的功能。然后分别建模并实现恰当的功能部件。再根据不同指令之间的关系合理地组建出简洁的数据通路。最后通过构建真值表构造控制器。\n">
+<meta property='og:url' content='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/'>
+<meta property='og:site_name' content='Messmerr&#39;s Personal Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-10-23T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-10-23T00:00:00&#43;00:00'/><meta property='og:image' content='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/pexels-jplenio-1105379.jpg' />
+<meta name="twitter:title" content="北航CO_P3-logisim搭建单周期CPU">
+<meta name="twitter:description" content=" 单周期CPU设计方案 概述 本文使用logisim搭建了一个支持八条指令的MIPS架构CPU。开发过程首先分析所需指令的RTL，抽象出所需要的功能。然后分别建模并实现恰当的功能部件。再根据不同指令之间的关系合理地组建出简洁的数据通路。最后通过构建真值表构造控制器。\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/pexels-jplenio-1105379.jpg' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu2167423299004510128.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😅</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Messmerr&#39;s Personal Blog</a></h1>
+            <h2 class="site-description">我不想学计组啊，你们有没有这样的计组啊</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/172832935'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-brand-bilibili"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 10a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v6a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4v-6z" /><path d="M8 3l2 3" /><path d="M16 3l-2 3" /><path d="M9 13v-2" /><path d="M15 11v2" /></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/messmerr'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com/Jeppard887'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E6%83%85%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友情链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#概述">概述</a></li>
+    <li><a href="#指令说明">指令说明</a>
+      <ol>
+        <li><a href="#r型指令">R型指令</a></li>
+        <li><a href="#i型指令">I型指令</a></li>
+        <li><a href="#空指令">空指令</a></li>
+      </ol>
+    </li>
+    <li><a href="#模块设计">模块设计</a>
+      <ol>
+        <li><a href="#pc">PC</a></li>
+        <li><a href="#npc">NPC</a></li>
+        <li><a href="#grf">GRF</a></li>
+        <li><a href="#im">IM</a></li>
+        <li><a href="#dm">DM</a></li>
+        <li><a href="#alu">ALU</a></li>
+      </ol>
+    </li>
+    <li><a href="#组建数据通路">组建数据通路</a>
+      <ol>
+        <li><a href="#取指令">取指令</a></li>
+        <li><a href="#指令分解">指令分解</a></li>
+        <li><a href="#addu--subu">ADDU &amp; SUBU</a></li>
+        <li><a href="#ori">ORI</a></li>
+        <li><a href="#lw">LW</a></li>
+        <li><a href="#sw">SW</a></li>
+        <li><a href="#beq">BEQ</a></li>
+        <li><a href="#lui">LUI</a></li>
+      </ol>
+    </li>
+    <li><a href="#控制信号">控制信号</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/">
+                <img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/pexels-jplenio-1105379_hu8574625950135968431.jpg"
+                        srcset="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/pexels-jplenio-1105379_hu8574625950135968431.jpg 800w, /p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/pexels-jplenio-1105379_hu9690125279550660521.jpg 1600w"
+                        width="800" 
+                        height="533" 
+                        loading="lazy"
+                        alt="Featured image of post 北航CO_P3-logisim搭建单周期CPU" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/co/" >
+                CO
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/">北航CO_P3-logisim搭建单周期CPU</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Oct 23, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <hr>
+<h1 id="单周期cpu设计方案">单周期CPU设计方案
+</h1><h2 id="概述">概述
+</h2><p>本文使用logisim搭建了一个支持八条指令的MIPS架构CPU。开发过程首先分析所需指令的RTL，抽象出所需要的功能。然后分别建模并实现恰当的功能部件。再根据不同指令之间的关系合理地组建出简洁的数据通路。最后通过构建真值表构造控制器。</p>
+<h2 id="指令说明">指令说明
+</h2><p>本文实现的CPU只包含题目要求的8条指令，但笔者在使用时进行了一些操作以增强可扩展性，下文会在相应位置介绍。</p>
+<h3 id="r型指令">R型指令
+</h3><ul>
+<li><code>add</code></li>
+<li><code>sub</code></li>
+</ul>
+<blockquote>
+<p>实际上实现的指令相当于<code>addu</code>和<code>subu</code>，因为题目明确指出不考虑溢出</p>
+</blockquote>
+<h3 id="i型指令">I型指令
+</h3><ul>
+<li><code>ori</code></li>
+<li><code>lw</code></li>
+<li><code>sw</code></li>
+<li><code>beq</code></li>
+<li><code>lui</code></li>
+</ul>
+<h3 id="空指令">空指令
+</h3><ul>
+<li><code>nop</code></li>
+</ul>
+<h2 id="模块设计">模块设计
+</h2><h3 id="pc">PC
+</h3><p>就是一个32位寄存器，没什么特别设计的。</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: center">信号名</th>
+          <th style="text-align: center">方向</th>
+          <th style="text-align: center">位宽</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">Clk</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">1</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">reset</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">1</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">DI</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">32</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">DO</td>
+          <td style="text-align: center">output</td>
+          <td style="text-align: center">32</td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="npc">NPC
+</h3><p>用组合逻辑计算出下一个指令的地址，通常是变为<code>PC+4</code>。对于跳转指令，本文只包含一个beq，但笔者为jal和jr留出了对应的接口。</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: center">信号名</th>
+          <th style="text-align: center">方向</th>
+          <th style="text-align: center">位宽</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">PC</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">32</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">imm16</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">16</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">imm26</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">26</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">A32</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">32</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">NPCOp</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">2</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">Zero</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">1</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">NPC</td>
+          <td style="text-align: center">output</td>
+          <td style="text-align: center">32</td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="grf">GRF
+</h3><p>寄存器堆，之前在P0已经设计过了。</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: center">信号名</th>
+          <th style="text-align: center">方向</th>
+          <th style="text-align: center">位宽</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">Clk</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">1</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">WE</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">1</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">reset</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">1</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">WD</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">32</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">A1</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">5</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">A2</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">5</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">A3</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">5</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">RD1</td>
+          <td style="text-align: center">output</td>
+          <td style="text-align: center">32</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">RD2</td>
+          <td style="text-align: center">output</td>
+          <td style="text-align: center">32</td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="im">IM
+</h3><p>指令存储器，使用ROM实现，此前我因为审题不仔细导致这里卡了很久。要注意ROM的地址是以一个字为单位而不是字节，也就是说两个指令在mars中显示的地址是相隔4，用ROM表示其实只相隔1.</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: center">信号名</th>
+          <th style="text-align: center">方向</th>
+          <th style="text-align: center">位宽</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">A</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">12</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">D</td>
+          <td style="text-align: center">output</td>
+          <td style="text-align: center">32</td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="dm">DM
+</h3><p>数据存储器，用RAM实现。与指令存储器相比只多了一个写数据的功能。</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: center">信号名</th>
+          <th style="text-align: center">方向</th>
+          <th style="text-align: center">位宽</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">Clk</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">1</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">Wr</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">1</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">A</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">10</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">DI</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">32</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">DO</td>
+          <td style="text-align: center">output</td>
+          <td style="text-align: center">32</td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="alu">ALU
+</h3><p>本文需要的指令只用得到四个运算：加、减、或和判断相等。其中等于可以用减来完成，减可以用补码来简化。</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: center">信号名</th>
+          <th style="text-align: center">方向</th>
+          <th style="text-align: center">位宽</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">a</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">32</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">b</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">32</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">op</td>
+          <td style="text-align: center">input</td>
+          <td style="text-align: center">2</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">c</td>
+          <td style="text-align: center">output</td>
+          <td style="text-align: center">32</td>
+      </tr>
+  </tbody>
+</table></div>
+<h2 id="组建数据通路">组建数据通路
+</h2><h3 id="取指令">取指令
+</h3><p>PC与NPC实际上组成了一个MOORE型状态机，除这两个模块的所有部分都可以看成转移电路。</p>
+<blockquote>
+<p>图是gxp老师课件上的，实际电路NPC应该有几根线</p>
+</blockquote>
+<p><img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image.png"
+	width="259"
+	height="205"
+	srcset="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu1257119938015792967.png 480w, /p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu17176869396698944874.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="126"
+		data-flex-basis="303px"
+	
+></p>
+<h3 id="指令分解">指令分解
+</h3><p>纯粹体力劳动，把所有可能出现的指令部分全部分离出来。
+<img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-1.png"
+	width="447"
+	height="263"
+	srcset="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-1_hu8684917992346940111.png 480w, /p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-1_hu8989696047024708657.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="169"
+		data-flex-basis="407px"
+	
+></p>
+<h3 id="addu--subu">ADDU &amp; SUBU
+</h3><p>最基础的指令，其他指令基本都是通过扩充这一部分的电路。
+电路中rs、rt、rd分别给出读写指令，将运算的结果写入rd对应的寄存器中。
+<img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-2.png"
+	width="375"
+	height="235"
+	srcset="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-2_hu9688860742562248011.png 480w, /p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-2_hu9898298850582058437.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="159"
+		data-flex-basis="382px"
+	
+></p>
+<h3 id="ori">ORI
+</h3><p>这一段稍微需要注意一下RTL。
+<img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/98d4648655182408d1449d73a0d1de9.png"
+	width="859"
+	height="364"
+	srcset="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/98d4648655182408d1449d73a0d1de9_hu6089035281481330811.png 480w, /p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/98d4648655182408d1449d73a0d1de9_hu15143189203310304875.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="235"
+		data-flex-basis="566px"
+	
+>
+由RTL知，我们要把立即数imm16作零扩展到32位后再参与或运算。同时，注意到这里需要输入GRF和ALU模块的信号与上面不同。rt作为了被写入的寄存器，同时进行运算的一个寄存器被换成了立即数。所以要在A3和B接口前使用MUX进行信号选择。每一次出现这类情况我们都用一个标签作为控制信号，最后使用打表方式一次性生成各指令的控制信号。
+<img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-3.png"
+	width="425"
+	height="334"
+	srcset="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-3_hu7305957060314092148.png 480w, /p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-3_hu8727959061812780460.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="127"
+		data-flex-basis="305px"
+	
+></p>
+<h3 id="lw">LW
+</h3><p><img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-4.png"
+	width="1068"
+	height="378"
+	srcset="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-4_hu6443185353931928984.png 480w, /p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-4_hu9297083337520267099.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="282"
+		data-flex-basis="678px"
+	
+>
+首次出现了要对DM进行操作的指令。此时ALU的输出作为读DM的地址，DM的输出被写入对应寄存器中。此外，这里需要对立即数imm16进行的是有符号扩展，所以对EXT也要进行信号选择。
+<img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-5.png"
+	width="468"
+	height="328"
+	srcset="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-5_hu8867463498713777001.png 480w, /p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-5_hu7130255315357254439.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="142"
+		data-flex-basis="342px"
+	
+></p>
+<h3 id="sw">SW
+</h3><p><img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/2e7fa4342d573f3942ad6a7ca10dded.png"
+	width="1102"
+	height="462"
+	srcset="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/2e7fa4342d573f3942ad6a7ca10dded_hu14048915399541119807.png 480w, /p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/2e7fa4342d573f3942ad6a7ca10dded_hu15226301040041250481.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="238"
+		data-flex-basis="572px"
+	
+>
+写入而非读取，只需要加一个输入的数据信号和读/写控制信号即可。
+<img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-6.png"
+	width="495"
+	height="339"
+	srcset="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-6_hu12203084715352990761.png 480w, /p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-6_hu8306275428917290872.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="146"
+		data-flex-basis="350px"
+	
+></p>
+<h3 id="beq">BEQ
+</h3><p>这一部分的逻辑主要是在NPC中完成的，此外只需要利用ALU的减法产生一个判断A、B是否相等的信号即可。
+<img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-7.png"
+	width="490"
+	height="337"
+	srcset="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-7_hu6149330859689517399.png 480w, /p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-7_hu13825922559627414455.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="145"
+		data-flex-basis="348px"
+	
+></p>
+<h3 id="lui">LUI
+</h3><p>唯一老师上课没讲的指令，所以白嫖不了结构图了（悲伤）。
+<img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/1a301a36ed4a4c9039f80669e96792d.png"
+	width="979"
+	height="382"
+	srcset="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/1a301a36ed4a4c9039f80669e96792d_hu1283075729208184123.png 480w, /p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/1a301a36ed4a4c9039f80669e96792d_hu549884947335130086.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="256"
+		data-flex-basis="615px"
+	
+>
+但实现非常简单，笔者将imm16拼接了一个16h'0的信号，然后直接连到GRF的WD端，配合MUX和控制信号即可。</p>
+<h2 id="控制信号">控制信号
+</h2><p>为了使控制电路便于阅读和debug，我们使用或逻辑搭建电路，这样使得连线的目的非常明确。生成控制信号也许是最重要的一步，因为这一步很容易粗心。笔者就连错了一条。这里直接把我做的电路放上来。</p>
+<blockquote>
+<p>有人可能会问和逻辑呢？因为我用的是比较器所以省略掉了hhh
+跟上面的信号名不完全一样，仅供参考。</p>
+</blockquote>
+<p><img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-8.png"
+	width="1878"
+	height="1171"
+	srcset="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-8_hu14412514712159542525.png 480w, /p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-8_hu9092032242994337340.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="160"
+		data-flex-basis="384px"
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Alogisim%E7%9A%84%E5%9F%BA%E7%A1%80%E8%BF%90%E7%94%A8/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Alogisim%E7%9A%84%E5%9F%BA%E7%A1%80%E8%BF%90%E7%94%A8/pawel-czerwinski-8uZPynIu-rQ-unsplash.c514d916917173a48a42e0114b469961_hu7626638945853200361.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 北航CO_P0课上——logisim的基础运用"
+                        
+                        data-hash="md5-xRTZFpFxc6SKQuARS0aZYQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">北航CO_P0课上——logisim的基础运用</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Bfsm/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Bfsm/matt-le-SJSpo9hQf7s-unsplash.46f61e8ea6a2df8fc5bf1d24a17c44a6_hu3238087930799200081.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 北航CO_P0课下——FSM"
+                        
+                        data-hash="md5-RvYejqai34/Fvx0koXxEpg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">北航CO_P0课下——FSM</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E5%8C%97%E8%88%AAco%E4%B8%8A%E6%9C%BA%E5%88%9D%E4%BD%93%E9%AA%8C/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E5%8C%97%E8%88%AAco%E4%B8%8A%E6%9C%BA%E5%88%9D%E4%BD%93%E9%AA%8C/the-creative-exchange-d2zvqp3fpro-unsplash.60116b1ccfc8632e9a65f7d51df3efc2_hu2042364712198079406.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 北航CO上机初体验"
+                        
+                        data-hash="md5-YBFrHM/IYy6aZffVHfPvwg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">北航CO上机初体验</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 Messmerr
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.27.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
