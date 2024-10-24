@@ -387,7 +387,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 3 分钟
+                    阅读时长: 5 分钟
                 </time>
             </div>
         
@@ -842,7 +842,7 @@
 <h2 id="控制信号">控制信号
 </h2><p>为了使控制电路便于阅读和debug，我们使用或逻辑搭建电路，这样使得连线的目的非常明确。生成控制信号也许是最重要的一步，因为这一步很容易粗心。笔者就连错了一条。这里直接把我做的电路放上来。</p>
 <blockquote>
-<p>有人可能会问和逻辑呢？因为我用的是比较器所以省略掉了hhh
+<p>有人可能会问和逻辑呢？因为我用的是比较器所以省略掉了hhh。
 跟上面的信号名不完全一样，仅供参考。</p>
 </blockquote>
 <p><img src="/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-8.png"
@@ -859,6 +859,189 @@
 		data-flex-basis="384px"
 	
 ></p>
+<h1 id="测试数据">测试数据
+</h1><p>以下是我测试用过的数据，其中前一部分是pre给出的样例数据</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">.macro save(%dst)
+</span></span><span class="line"><span class="cl">sw %dst,0($v0)
+</span></span><span class="line"><span class="cl">lui $v1,0
+</span></span><span class="line"><span class="cl">ori $v1,$v1,4
+</span></span><span class="line"><span class="cl">add $v0,$v0,$v1
+</span></span><span class="line"><span class="cl">.end_macro
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">ori $a0, $0, 123
+</span></span><span class="line"><span class="cl">ori $a1, $a0, 456
+</span></span><span class="line"><span class="cl">lui $a2, 123            # 符号位为 0
+</span></span><span class="line"><span class="cl">lui $a3, 0xffff         # 符号位为 1
+</span></span><span class="line"><span class="cl">ori $a3, $a3, 0xffff    # $a3 = -1
+</span></span><span class="line"><span class="cl">add $s0, $a0, $a2      # 正正
+</span></span><span class="line"><span class="cl">add $s1, $a0, $a3      # 正负
+</span></span><span class="line"><span class="cl">add $s2, $a3, $a3      # 负负
+</span></span><span class="line"><span class="cl">ori $t0, $0, 0x0000
+</span></span><span class="line"><span class="cl">sw $a0, 0($t0)
+</span></span><span class="line"><span class="cl">sw $a1, 4($t0)
+</span></span><span class="line"><span class="cl">sw $a2, 8($t0)
+</span></span><span class="line"><span class="cl">sw $a3, 12($t0)
+</span></span><span class="line"><span class="cl">sw $s0, 16($t0)
+</span></span><span class="line"><span class="cl">sw $s1, 20($t0)
+</span></span><span class="line"><span class="cl">sw $s2, 24($t0)
+</span></span><span class="line"><span class="cl">lw $a0, 0($t0)
+</span></span><span class="line"><span class="cl">lw $a1, 12($t0)
+</span></span><span class="line"><span class="cl">sw $a0, 28($t0)
+</span></span><span class="line"><span class="cl">sw $a1, 32($t0)
+</span></span><span class="line"><span class="cl">ori $a0, $0, 1
+</span></span><span class="line"><span class="cl">ori $a1, $0, 2
+</span></span><span class="line"><span class="cl">ori $a2, $0, 1
+</span></span><span class="line"><span class="cl">beq $a0, $a1, loop1     # 不相等
+</span></span><span class="line"><span class="cl">beq $a0, $a2, loop2     # 相等
+</span></span><span class="line"><span class="cl">loop1:sw $a0, 36($t0)
+</span></span><span class="line"><span class="cl">loop2:sw $a1, 40($t0)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#以下为新写的
+</span></span><span class="line"><span class="cl">sub $v0,$v0,$v0
+</span></span><span class="line"><span class="cl">save($0)
+</span></span><span class="line"><span class="cl">save($0)
+</span></span><span class="line"><span class="cl">save($0)
+</span></span><span class="line"><span class="cl">save($0)
+</span></span><span class="line"><span class="cl">save($0)
+</span></span><span class="line"><span class="cl">save($0)
+</span></span><span class="line"><span class="cl">save($0)
+</span></span><span class="line"><span class="cl">save($0)
+</span></span><span class="line"><span class="cl">save($0)
+</span></span><span class="line"><span class="cl">save($0)
+</span></span><span class="line"><span class="cl">save($0)
+</span></span><span class="line"><span class="cl">save($0)
+</span></span><span class="line"><span class="cl">sub $v0,$v0,$v0
+</span></span><span class="line"><span class="cl">lui $t0,0x7fff
+</span></span><span class="line"><span class="cl">ori $t0,$t0,0xffff
+</span></span><span class="line"><span class="cl">lui $t1,0xffff
+</span></span><span class="line"><span class="cl">ori $t1,$t1,0xffff
+</span></span><span class="line"><span class="cl">lui $t2,0
+</span></span><span class="line"><span class="cl">ori $t2,$t2,1
+</span></span><span class="line"><span class="cl">lui $t3,0x8000
+</span></span><span class="line"><span class="cl">ori $t3,$t3,0
+</span></span><span class="line"><span class="cl">add $s4,$t0,$t2
+</span></span><span class="line"><span class="cl">save($s4)
+</span></span><span class="line"><span class="cl">add $s4,$t3,$t1
+</span></span><span class="line"><span class="cl">save($s4)
+</span></span><span class="line"><span class="cl">sub $s4,$t0,$t1
+</span></span><span class="line"><span class="cl">save($s4)
+</span></span><span class="line"><span class="cl">sub $s4,$t0,$t2
+</span></span><span class="line"><span class="cl">save($s4)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">lui $s0,0
+</span></span><span class="line"><span class="cl">beq $a1,$a1,equal
+</span></span><span class="line"><span class="cl">ori $s0,$s0,0x1111
+</span></span><span class="line"><span class="cl">equal:
+</span></span><span class="line"><span class="cl">ori $s0,$s0,1
+</span></span><span class="line"><span class="cl">save($s0)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">lui $s0,0
+</span></span><span class="line"><span class="cl">ori $s0,$s0,1
+</span></span><span class="line"><span class="cl">equal2:
+</span></span><span class="line"><span class="cl">add $s0,$s0,$s0
+</span></span><span class="line"><span class="cl">beq $a1,$a1,equal2
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">save($s0)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="思考题">思考题
+</h1><ol>
+<li>上面我们介绍了通过 FSM 理解单周期 CPU 的基本方法。请大家指出单周期 CPU 所用到的模块中，哪些发挥状态存储功能，哪些发挥状态转移功能。
+答：发挥状态存储功能的模块：IFU、DM、GRF。发挥状态转移功能的模块：NPC、ALU、Control。</li>
+<li>现在我们的模块中 IM 使用 ROM， DM 使用 RAM， GRF 使用 Register，这种做法合理吗？ 请给出分析，若有改进意见也请一并给出。
+答：合理，因为在本次的单周期CPU设计中，指令是只读的，所以使用只读的ROM进行存储。而DM需要频繁进行读写，所以使用RAM。GRF使用Register是标准设计，因为GRF本身就是寄存器堆，使用一堆寄存器搭建寄存器堆显然合理。此外，寄存器有高读写速度，适用于GRF的工作内容。</li>
+<li>在上述提示的模块之外，你是否在实际实现时设计了其他的模块？如果是的话，请给出介绍和设计的思路。
+答：没有。</li>
+<li>事实上，实现 nop 空指令，我们并不需要将它加入控制信号真值表，为什么？
+答：不需要。因为nop相当于sll $0,$0,0。即使在设置了sll指令时，因为这条指令并不改变寄存器值，也不会对运行产生影响。更别说我们这次的CPU压根没有实现sll指令。</li>
+<li>阅读 Pre 的 “MIPS 指令集及汇编语言” 一节中给出的测试样例，评价其强度（可从各个指令的覆盖情况，单一指令各种行为的覆盖情况等方面分析），并指出具体的不足之处。
+答：总体来看相当弱。没有覆盖sub指令。对add指令测试了正正、正负、负负三种情况，较全面，但是没有针对极端值进行测试（虽然本CPU的add和sub不考虑溢出）。对于beq的测试也过于简单，没有测试offset和寄存器值为负和为0的情况。lw也没有针对$0寄存器作出检验。</li>
+</ol>
 
 </section>
 
