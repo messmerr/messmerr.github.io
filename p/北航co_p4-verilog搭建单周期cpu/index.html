@@ -373,7 +373,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 4 分钟
+                    阅读时长: 5 分钟
                 </time>
             </div>
         
@@ -879,6 +879,137 @@
       </tr>
   </tbody>
 </table></div>
+<h1 id="思考题">思考题
+</h1><ol>
+<li>阅读下面给出的 DM 的输入示例中（示例 DM 容量为 4KB，即 32bit × 1024字），根据你的理解回答，这个 <code>addr</code> 信号又是从哪里来的？地址信号 <code>addr</code> 位数为什么是 [11:2] 而不是 [9:0] ？
+<img src="/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image.png"
+	width="845"
+	height="269"
+	srcset="/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu15649591888432985222.png 480w, /p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu6653204169145448707.png 1024w"
+	loading="lazy"
+	
+		alt="alt text"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="314"
+		data-flex-basis="753px"
+	
+>
+答：<code>addr</code>是ALU通过将寄存器值与偏移量<code>offset</code>相加得到的地址信号，之所以取[11:2]是因为DM的存储是以32bit为单位，而地址信号是以8bit为单位，故略去后两位使地址信号与DM内的存储地址一致。</li>
+<li>思考上述两种控制器设计的译码方式，给出代码示例，并尝试对比各方式的优劣
+答：指令对应的控制信号如何取值：
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-verilog" data-lang="verilog"><span class="line"><span class="cl"><span class="k">case</span> <span class="p">(</span><span class="n">opcode</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">     <span class="mh">6</span><span class="mb">&#39;b000000</span><span class="o">:</span> <span class="k">begin</span> <span class="c1">// R型指令，funct决定操作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>         <span class="k">case</span> <span class="p">(</span><span class="n">funct</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">             <span class="mh">6</span><span class="mb">&#39;b100000</span><span class="o">:</span> <span class="k">begin</span> <span class="c1">// add
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                 <span class="n">RegWrite</span> <span class="o">=</span> <span class="mh">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">ALUOp</span> <span class="o">=</span> <span class="mh">3</span><span class="mb">&#39;b000</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">WAOp</span> <span class="o">=</span> <span class="mh">2</span><span class="mb">&#39;b01</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">NPCOp</span> <span class="o">=</span> <span class="mh">3</span><span class="mb">&#39;b0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">MemWrite</span> <span class="o">=</span> <span class="mh">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">ExtOp</span> <span class="o">=</span> <span class="mh">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">WDOp</span> <span class="o">=</span> <span class="mh">2</span><span class="mb">&#39;b0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">BOp</span> <span class="o">=</span> <span class="mh">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">             <span class="k">end</span>
+</span></span><span class="line"><span class="cl">             <span class="mh">6</span><span class="mb">&#39;b100010</span><span class="o">:</span> <span class="k">begin</span> <span class="c1">// sub
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                 <span class="n">RegWrite</span> <span class="o">=</span> <span class="mh">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">ALUOp</span> <span class="o">=</span> <span class="mh">3</span><span class="mb">&#39;b001</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">WAOp</span> <span class="o">=</span> <span class="mh">2</span><span class="mb">&#39;b01</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">NPCOp</span> <span class="o">=</span> <span class="mh">3</span><span class="mb">&#39;b0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">MemWrite</span> <span class="o">=</span> <span class="mh">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">ExtOp</span> <span class="o">=</span> <span class="mh">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">WDOp</span> <span class="o">=</span> <span class="mh">2</span><span class="mb">&#39;b0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">BOp</span> <span class="o">=</span> <span class="mh">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">             <span class="k">end</span>
+</span></span><span class="line"><span class="cl">             <span class="c1">//略
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>         <span class="k">endcase</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">//略
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span> <span class="k">endcase</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>控制信号每种取值时对应的指令：
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-verilog" data-lang="verilog"><span class="line"><span class="cl"><span class="k">assign</span> <span class="n">NPCOp</span> <span class="o">=</span> <span class="n">beq</span> <span class="o">?</span> <span class="mh">3</span><span class="mb">&#39;b001</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">jal</span> <span class="o">?</span> <span class="mh">3</span><span class="mb">&#39;b010</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">jr</span>  <span class="o">?</span> <span class="mh">3</span><span class="mb">&#39;b011</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="mh">3</span><span class="mb">&#39;b0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> <span class="k">assign</span> <span class="n">RegWrite</span> <span class="o">=</span> <span class="n">add</span> <span class="o">||</span> <span class="n">sub</span> <span class="o">||</span> <span class="n">ori</span> <span class="o">||</span> <span class="n">lw</span> <span class="o">||</span> <span class="n">lui</span> <span class="o">||</span> <span class="n">jal</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> <span class="k">assign</span> <span class="n">ALUOp</span> <span class="o">=</span> <span class="n">add</span> <span class="o">||</span> <span class="n">lw</span> <span class="o">||</span> <span class="n">sw</span> <span class="o">?</span> <span class="mh">3</span><span class="mb">&#39;b000</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">sub</span> <span class="o">||</span> <span class="n">beq</span> <span class="o">?</span> <span class="mh">3</span><span class="mb">&#39;b001</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">ori</span> <span class="o">?</span> <span class="mh">3</span><span class="mb">&#39;b010</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="mh">3</span><span class="mb">&#39;b111</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> <span class="k">assign</span> <span class="n">MemWrite</span> <span class="o">=</span> <span class="n">sw</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> <span class="k">assign</span> <span class="n">ExtOp</span> <span class="o">=</span> <span class="n">ori</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> <span class="k">assign</span> <span class="n">WAOp</span> <span class="o">=</span> <span class="n">add</span> <span class="o">||</span> <span class="n">sub</span> <span class="o">||</span> <span class="n">jr</span> <span class="o">?</span> <span class="mh">2</span><span class="mb">&#39;b01</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">               <span class="n">jal</span> <span class="o">?</span> <span class="mh">2</span><span class="mb">&#39;b10</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">               <span class="mh">2</span><span class="mb">&#39;b0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> <span class="k">assign</span> <span class="n">WDOp</span> <span class="o">=</span> <span class="n">lw</span> <span class="o">?</span> <span class="mh">2</span><span class="mb">&#39;b01</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">               <span class="n">lui</span><span class="o">?</span> <span class="mh">2</span><span class="mb">&#39;b10</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">               <span class="n">jal</span><span class="o">?</span> <span class="mh">2</span><span class="mb">&#39;b11</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">               <span class="mh">2</span><span class="mb">&#39;b0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> <span class="k">assign</span> <span class="n">BOp</span> <span class="o">=</span> <span class="n">ori</span> <span class="o">||</span> <span class="n">lw</span> <span class="o">||</span> <span class="n">sw</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>在相应的部件中，复位信号的设计都是同步复位，这与 P3 中的设计要求不同。请对比同步复位与异步复位这两种方式的 <code>reset</code> 信号与 <code>clk</code> 信号优先级的关系。
+答：同步复位中<code>clk</code>信号优先级更高，只有<code>clk</code>上升沿到来时<code>reset</code>信号才有影响，而异步复位二者地位相当，二者都可以随时生效。</li>
+<li>C 语言是一种弱类型程序设计语言。C 语言中不对计算结果溢出进行处理，这意味着 C 语言要求程序员必须很清楚计算结果是否会导致溢出。因此，如果仅仅支持 C 语言，MIPS 指令的所有计算指令均可以忽略溢出。 请说明为什么在忽略溢出的前提下，<code>addi</code> 与 <code>addiu</code> 是等价的，<code>add</code> 与 <code>addu</code> 是等价的。
+答：以<code>add</code>与<code>addu</code>为例，从RTL描述中可以看出，<code>addu</code>就是在<code>add</code>的基础上增加了如果运算结果最高位和次高位不相等就抛出报错，所以如果忽略这个溢出，二者就是等价的。<code>addi</code>和<code>addiu</code>同理。</li>
+</ol>
 
 </section>
 
