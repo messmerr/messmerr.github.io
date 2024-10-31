@@ -7,7 +7,637 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>Messmerr</copyright>
-        <lastBuildDate>Wed, 23 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://messmerr.github.io/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 31 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://messmerr.github.io/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>北航CO_P4-verilog搭建单周期CPU</title>
+        <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</link>
+        <pubDate>Thu, 31 Oct 2024 00:00:00 +0000</pubDate>
+        
+        <guid>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</guid>
+        <description>&lt;img src="https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/growtika-P5mCQ4KACbM-unsplash.jpg" alt="Featured image of post 北航CO_P4-verilog搭建单周期CPU" /&gt;&lt;hr&gt;
+&lt;h1 id=&#34;单周期cpu设计方案&#34;&gt;单周期CPU设计方案
+&lt;/h1&gt;&lt;h2 id=&#34;概述&#34;&gt;概述
+&lt;/h2&gt;&lt;p&gt;本次课下主要依靠P3的logisim进行翻译，不过我也对P3设计的一系列不合理之处进行了调整。我首先根据logisim电路图搭建各个模块，随后在mips.v文件中把各个模块合理地连接起来，最后添加controller模块产生控制信号。&lt;/p&gt;
+&lt;h2 id=&#34;指令说明&#34;&gt;指令说明
+&lt;/h2&gt;&lt;p&gt;本文实现的CPU在P3基础上添加了2条指令，即&lt;code&gt;jal&lt;/code&gt;和&lt;code&gt;jr&lt;/code&gt;。&lt;/p&gt;
+&lt;h3 id=&#34;r型指令&#34;&gt;R型指令
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;add&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sub&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;jr&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;实际上实现的指令相当于&lt;code&gt;addu&lt;/code&gt;和&lt;code&gt;subu&lt;/code&gt;，因为题目明确指出不考虑溢出&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;i型指令&#34;&gt;I型指令
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ori&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;lw&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sw&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;beq&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;lui&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;j型指令&#34;&gt;J型指令
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;jal&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;空指令&#34;&gt;空指令
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;nop&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;功能模块设计&#34;&gt;功能模块设计
+&lt;/h2&gt;&lt;h3 id=&#34;ifu&#34;&gt;IFU
+&lt;/h3&gt;&lt;p&gt;将PC和IM合二为一。IM使用&lt;code&gt;$readmehn&lt;/code&gt;语句读取&lt;code&gt;code.txt&lt;/code&gt;文件里的指令。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;clk&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;时钟信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;reset&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;复位信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;next_pc&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;下一个指令地址&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;PC&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;当前指令地址寄存器&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;instr&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;当前指令&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;npc&#34;&gt;NPC
+&lt;/h3&gt;&lt;p&gt;用组合逻辑计算出下一个指令的地址，通常是变为&lt;code&gt;PC+4&lt;/code&gt;。根据控制信号不同会执行&lt;code&gt;beq/jal/jr&lt;/code&gt;三种跳转。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;PC&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;当前指令地址&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;offset&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;分支偏移量&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;16&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;instr_26&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;指令中26位目标地址&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;26&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;ra_data&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;从GRF返回的地址数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;zero&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;分支条件标志&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;NPCOp&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;下一地址选择操作码&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;3&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;next_pc&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;计算后的下一指令地址&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;pc_add_4&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;当前地址加4的值&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;grf&#34;&gt;GRF
+&lt;/h3&gt;&lt;p&gt;寄存器堆，同样是翻译即可。注意要&lt;code&gt;display&lt;/code&gt;否则无法评测。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;clk&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;时钟信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;reset&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;复位信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;RegWrite&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;寄存器写入使能信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;RA1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;读寄存器1地址&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;RA2&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;读寄存器2地址&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;WA&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;写寄存器地址&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;WD&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;写入数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;RD1&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;读寄存器1数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;RD2&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;读寄存器2数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;PC&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;当前程序计数器地址&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;dm&#34;&gt;DM
+&lt;/h3&gt;&lt;p&gt;数据存储器，朴实无华的读写功能。同样需要&lt;code&gt;display&lt;/code&gt;。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;PC&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;当前程序计数器地址&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;clk&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;时钟信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;reset&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;复位信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;MemWrite&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;内存写入使能信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;WA&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;写地址&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;WD&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;写入数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;RD&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;读取数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;alu&#34;&gt;ALU
+&lt;/h3&gt;&lt;p&gt;本文需要的指令只需要四个运算：加、减、或。相等的判断用减法实现。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;ALUOp&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;ALU操作选择信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;3&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;A&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;ALU第一个操作数&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;B&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;ALU第二个操作数&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;zero&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;结果是否为零标志&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;ALU_res&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;ALU运算结果&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;mux&#34;&gt;MUX
+&lt;/h3&gt;&lt;p&gt;这个模块的设计和每个人自身的电路设计高度相关，我认为先建立&lt;code&gt;mips.v&lt;/code&gt;顶层文件再构造更好。具体内容在下一部分讲解。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;rt&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;源寄存器1地址&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;rd&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;源寄存器2地址&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;WAOp&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;写地址选择操作码&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;MemRD&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;从内存读取的数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;offset&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;偏移量&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;16&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;ALU_res&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;ALU运算结果&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;pc_add_4&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;当前PC加4的值&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;WDOp&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;写数据选择操作码&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;RD2&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;第二个读寄存器的数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Ext_imm16&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;扩展的16位立即数&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;BOp&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;B选择信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;B&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;选择的第二个操作数&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;WD&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;写入的数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;A3&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;写入的目标寄存器地址&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;组建数据通路&#34;&gt;组建数据通路
+&lt;/h2&gt;&lt;p&gt;verilog组建数据通路的难度远大于logisim，因为不够直观，很容易漏接某些线。我认为比较不容易出错的设计方式如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;将除MUX外的所有模块放入&lt;code&gt;mips.v&lt;/code&gt;文件中并接上所有的&lt;code&gt;I/O&lt;/code&gt;端口。为防出错，所有的接口都用同名&lt;code&gt;wire&lt;/code&gt;连接，可以先连好再定义这些&lt;code&gt;wire&lt;/code&gt;型变量。&lt;/li&gt;
+&lt;li&gt;观察不同模块的接口，根据自己整理的表格/P3的电路图确定哪些端口之间是一对一连接的。使用assign语句把连接到对应端口的&lt;code&gt;wire&lt;/code&gt;变量链接在一起。&lt;/li&gt;
+&lt;li&gt;对于需要用到多路选择器的端口，我们建立一个统一的&lt;code&gt;MUX&lt;/code&gt;模块，这个模块负责处理所有需要进行信号选择的端口。我们将所有可能的输入信号和一会用&lt;code&gt;Controller.v&lt;/code&gt;产生的选择信号全部作为&lt;code&gt;MUX&lt;/code&gt;的输入，所有输出信号作为输出，内部使用条件判断语句为各个输出信号赋上对应的值。随后将其添加到&lt;code&gt;mips.v&lt;/code&gt;中。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;控制信号&#34;&gt;控制信号
+&lt;/h2&gt;&lt;p&gt;建立一个新的&lt;code&gt;Controller.v&lt;/code&gt;模块，因为CPU操作只跟指令有关，所以输入只需要&lt;code&gt;opcode&lt;/code&gt;和&lt;code&gt;funct&lt;/code&gt;。对于其内部结构，我喜欢先为每一条指令单独定义一个&lt;code&gt;wire&lt;/code&gt;型变量，再以这些变量为条件去编写控制信号的生成逻辑。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;opcode&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;指令操作码&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;6&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;funct&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;功能码，用于区分操作类型&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;6&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;NPCOp&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;下一地址选择操作码&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;3&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;RegWrite&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;寄存器写使能信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;ALUOp&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;ALU操作码&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;3&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;MemWrite&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;内存写使能信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;ExtOp&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;立即数扩展操作选择信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;WAOp&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;写地址选择操作码&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;WDOp&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;写数据选择操作码&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;2&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;BOp&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;第二操作数选择信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h1 id=&#34;思考题&#34;&gt;思考题
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;阅读下面给出的 DM 的输入示例中（示例 DM 容量为 4KB，即 32bit × 1024字），根据你的理解回答，这个 &lt;code&gt;addr&lt;/code&gt; 信号又是从哪里来的？地址信号 &lt;code&gt;addr&lt;/code&gt; 位数为什么是 [11:2] 而不是 [9:0] ？
+&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image.png&#34;
+	width=&#34;845&#34;
+	height=&#34;269&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu15649591888432985222.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu6653204169145448707.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;314&#34;
+		data-flex-basis=&#34;753px&#34;
+	
+&gt;
+答：&lt;code&gt;addr&lt;/code&gt;是ALU通过将寄存器值与偏移量&lt;code&gt;offset&lt;/code&gt;相加得到的地址信号，之所以取[11:2]是因为DM的存储是以32bit为单位，而地址信号是以8bit为单位，故略去后两位使地址信号与DM内的存储地址一致。&lt;/li&gt;
+&lt;li&gt;思考上述两种控制器设计的译码方式，给出代码示例，并尝试对比各方式的优劣
+答：指令对应的控制信号如何取值：
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-verilog&#34; data-lang=&#34;verilog&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;case&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;opcode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;     &lt;span class=&#34;mh&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b000000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;begin&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// R型指令，funct决定操作
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;         &lt;span class=&#34;k&#34;&gt;case&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;funct&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;             &lt;span class=&#34;mh&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b100000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;begin&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// add
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;                 &lt;span class=&#34;n&#34;&gt;RegWrite&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;ALUOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b000&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;WAOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b01&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;NPCOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;MemWrite&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;ExtOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;WDOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;BOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;             &lt;span class=&#34;k&#34;&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;             &lt;span class=&#34;mh&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b100010&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;begin&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// sub
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;                 &lt;span class=&#34;n&#34;&gt;RegWrite&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;ALUOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b001&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;WAOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b01&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;NPCOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;MemWrite&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;ExtOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;WDOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;BOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;             &lt;span class=&#34;k&#34;&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;             &lt;span class=&#34;c1&#34;&gt;//略
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;         &lt;span class=&#34;k&#34;&gt;endcase&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;c1&#34;&gt;//略
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;endcase&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;控制信号每种取值时对应的指令：
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-verilog&#34; data-lang=&#34;verilog&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;NPCOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;beq&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b001&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;n&#34;&gt;jal&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b010&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;n&#34;&gt;jr&lt;/span&gt;  &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b011&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;RegWrite&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;add&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sub&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ori&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;lw&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;lui&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;jal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ALUOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;add&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;lw&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sw&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;n&#34;&gt;sub&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;beq&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b001&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;n&#34;&gt;ori&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b010&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b111&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MemWrite&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sw&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ExtOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ori&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;WAOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;add&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sub&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;jr&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b01&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;               &lt;span class=&#34;n&#34;&gt;jal&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b10&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;               &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;WDOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;lw&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b01&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;               &lt;span class=&#34;n&#34;&gt;lui&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b10&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;               &lt;span class=&#34;n&#34;&gt;jal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b11&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;               &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;BOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ori&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;lw&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sw&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;在相应的部件中，复位信号的设计都是同步复位，这与 P3 中的设计要求不同。请对比同步复位与异步复位这两种方式的 &lt;code&gt;reset&lt;/code&gt; 信号与 &lt;code&gt;clk&lt;/code&gt; 信号优先级的关系。
+答：同步复位中&lt;code&gt;clk&lt;/code&gt;信号优先级更高，只有&lt;code&gt;clk&lt;/code&gt;上升沿到来时&lt;code&gt;reset&lt;/code&gt;信号才有影响，而异步复位二者地位相当，二者都可以随时生效。&lt;/li&gt;
+&lt;li&gt;C 语言是一种弱类型程序设计语言。C 语言中不对计算结果溢出进行处理，这意味着 C 语言要求程序员必须很清楚计算结果是否会导致溢出。因此，如果仅仅支持 C 语言，MIPS 指令的所有计算指令均可以忽略溢出。 请说明为什么在忽略溢出的前提下，&lt;code&gt;addi&lt;/code&gt; 与 &lt;code&gt;addiu&lt;/code&gt; 是等价的，&lt;code&gt;add&lt;/code&gt; 与 &lt;code&gt;addu&lt;/code&gt; 是等价的。
+答：以&lt;code&gt;add&lt;/code&gt;与&lt;code&gt;addu&lt;/code&gt;为例，从RTL描述中可以看出，&lt;code&gt;addu&lt;/code&gt;就是在&lt;code&gt;add&lt;/code&gt;的基础上增加了如果运算结果最高位和次高位不相等就抛出报错，所以如果忽略这个溢出，二者就是等价的。&lt;code&gt;addi&lt;/code&gt;和&lt;code&gt;addiu&lt;/code&gt;同理。&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
         <title>北航CO_P3-logisim搭建单周期CPU</title>
         <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</link>
         <pubDate>Wed, 23 Oct 2024 00:00:00 +0000</pubDate>
@@ -655,636 +1285,6 @@
 答：不需要。因为nop相当于sll $0,$0,0。即使在设置了sll指令时，因为这条指令并不改变寄存器值，也不会对运行产生影响。更别说我们这次的CPU压根没有实现sll指令。&lt;/li&gt;
 &lt;li&gt;阅读 Pre 的 “MIPS 指令集及汇编语言” 一节中给出的测试样例，评价其强度（可从各个指令的覆盖情况，单一指令各种行为的覆盖情况等方面分析），并指出具体的不足之处。
 答：总体来看相当弱。没有覆盖sub指令。对add指令测试了正正、正负、负负三种情况，较全面，但是没有针对极端值进行测试（虽然本CPU的add和sub不考虑溢出）。对于beq的测试也过于简单，没有测试offset和寄存器值为负和为0的情况。lw也没有针对$0寄存器作出检验。&lt;/li&gt;
-&lt;/ol&gt;
-</description>
-        </item>
-        <item>
-        <title>北航CO_P4-verilog搭建单周期CPU</title>
-        <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</link>
-        <pubDate>Wed, 23 Oct 2024 00:00:00 +0000</pubDate>
-        
-        <guid>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</guid>
-        <description>&lt;img src="https://messmerr.github.io/pexels-jplenio-1105379.jpg" alt="Featured image of post 北航CO_P4-verilog搭建单周期CPU" /&gt;&lt;hr&gt;
-&lt;h1 id=&#34;单周期cpu设计方案&#34;&gt;单周期CPU设计方案
-&lt;/h1&gt;&lt;h2 id=&#34;概述&#34;&gt;概述
-&lt;/h2&gt;&lt;p&gt;本次课下主要依靠P3的logisim进行翻译，不过我也对P3设计的一系列不合理之处进行了调整。我首先根据logisim电路图搭建各个模块，随后在mips.v文件中把各个模块合理地连接起来，最后添加controller模块产生控制信号。&lt;/p&gt;
-&lt;h2 id=&#34;指令说明&#34;&gt;指令说明
-&lt;/h2&gt;&lt;p&gt;本文实现的CPU在P3基础上添加了2条指令，即&lt;code&gt;jal&lt;/code&gt;和&lt;code&gt;jr&lt;/code&gt;。&lt;/p&gt;
-&lt;h3 id=&#34;r型指令&#34;&gt;R型指令
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;add&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;sub&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;jr&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;blockquote&gt;
-&lt;p&gt;实际上实现的指令相当于&lt;code&gt;addu&lt;/code&gt;和&lt;code&gt;subu&lt;/code&gt;，因为题目明确指出不考虑溢出&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h3 id=&#34;i型指令&#34;&gt;I型指令
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;ori&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;lw&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;sw&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;beq&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;lui&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;j型指令&#34;&gt;J型指令
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;jal&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;空指令&#34;&gt;空指令
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;nop&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;功能模块设计&#34;&gt;功能模块设计
-&lt;/h2&gt;&lt;h3 id=&#34;ifu&#34;&gt;IFU
-&lt;/h3&gt;&lt;p&gt;将PC和IM合二为一。IM使用&lt;code&gt;$readmehn&lt;/code&gt;语句读取&lt;code&gt;code.txt&lt;/code&gt;文件里的指令。&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;clk&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;时钟信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;reset&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;复位信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;next_pc&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;下一个指令地址&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;PC&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;当前指令地址寄存器&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;instr&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;当前指令&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id=&#34;npc&#34;&gt;NPC
-&lt;/h3&gt;&lt;p&gt;用组合逻辑计算出下一个指令的地址，通常是变为&lt;code&gt;PC+4&lt;/code&gt;。根据控制信号不同会执行&lt;code&gt;beq/jal/jr&lt;/code&gt;三种跳转。&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;PC&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;当前指令地址&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;offset&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;分支偏移量&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;16&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;instr_26&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;指令中26位目标地址&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;26&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;ra_data&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;从GRF返回的地址数据&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;zero&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;分支条件标志&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;NPCOp&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;下一地址选择操作码&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;3&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;next_pc&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;计算后的下一指令地址&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;pc_add_4&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;当前地址加4的值&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id=&#34;grf&#34;&gt;GRF
-&lt;/h3&gt;&lt;p&gt;寄存器堆，同样是翻译即可。注意要&lt;code&gt;display&lt;/code&gt;否则无法评测。&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;clk&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;时钟信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;reset&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;复位信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;RegWrite&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;寄存器写入使能信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;RA1&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;读寄存器1地址&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;RA2&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;读寄存器2地址&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;WA&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;写寄存器地址&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;WD&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;写入数据&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;RD1&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;读寄存器1数据&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;RD2&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;读寄存器2数据&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;PC&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;当前程序计数器地址&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id=&#34;dm&#34;&gt;DM
-&lt;/h3&gt;&lt;p&gt;数据存储器，朴实无华的读写功能。同样需要&lt;code&gt;display&lt;/code&gt;。&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;PC&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;当前程序计数器地址&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;clk&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;时钟信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;reset&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;复位信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;MemWrite&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;内存写入使能信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;WA&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;写地址&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;WD&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;写入数据&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;RD&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;读取数据&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id=&#34;alu&#34;&gt;ALU
-&lt;/h3&gt;&lt;p&gt;本文需要的指令只需要四个运算：加、减、或。相等的判断用减法实现。&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;ALUOp&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;ALU操作选择信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;3&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;A&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;ALU第一个操作数&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;B&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;ALU第二个操作数&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;zero&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;结果是否为零标志&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;ALU_res&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;ALU运算结果&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id=&#34;mux&#34;&gt;MUX
-&lt;/h3&gt;&lt;p&gt;这个模块的设计和每个人自身的电路设计高度相关，我认为先建立&lt;code&gt;mips.v&lt;/code&gt;顶层文件再构造更好。具体内容在下一部分讲解。&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;rt&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;源寄存器1地址&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;rd&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;源寄存器2地址&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;WAOp&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;写地址选择操作码&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;2&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;MemRD&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;从内存读取的数据&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;offset&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;偏移量&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;16&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;ALU_res&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;ALU运算结果&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;pc_add_4&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;当前PC加4的值&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;WDOp&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;写数据选择操作码&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;2&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;RD2&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;第二个读寄存器的数据&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;Ext_imm16&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;扩展的16位立即数&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;BOp&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;B选择信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;B&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;选择的第二个操作数&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;WD&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;写入的数据&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;A3&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;写入的目标寄存器地址&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h2 id=&#34;组建数据通路&#34;&gt;组建数据通路
-&lt;/h2&gt;&lt;p&gt;verilog组建数据通路的难度远大于logisim，因为不够直观，很容易漏接某些线。我认为比较不容易出错的设计方式如下：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;将除MUX外的所有模块放入&lt;code&gt;mips.v&lt;/code&gt;文件中并接上所有的&lt;code&gt;I/O&lt;/code&gt;端口。为防出错，所有的接口都用同名&lt;code&gt;wire&lt;/code&gt;连接，可以先连好再定义这些&lt;code&gt;wire&lt;/code&gt;型变量。&lt;/li&gt;
-&lt;li&gt;观察不同模块的接口，根据自己整理的表格/P3的电路图确定哪些端口之间是一对一连接的。使用assign语句把连接到对应端口的&lt;code&gt;wire&lt;/code&gt;变量链接在一起。&lt;/li&gt;
-&lt;li&gt;对于需要用到多路选择器的端口，我们建立一个统一的&lt;code&gt;MUX&lt;/code&gt;模块，这个模块负责处理所有需要进行信号选择的端口。我们将所有可能的输入信号和一会用&lt;code&gt;Controller.v&lt;/code&gt;产生的选择信号全部作为&lt;code&gt;MUX&lt;/code&gt;的输入，所有输出信号作为输出，内部使用条件判断语句为各个输出信号赋上对应的值。随后将其添加到&lt;code&gt;mips.v&lt;/code&gt;中。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&#34;控制信号&#34;&gt;控制信号
-&lt;/h2&gt;&lt;p&gt;建立一个新的&lt;code&gt;Controller.v&lt;/code&gt;模块，因为CPU操作只跟指令有关，所以输入只需要&lt;code&gt;opcode&lt;/code&gt;和&lt;code&gt;funct&lt;/code&gt;。对于其内部结构，我喜欢先为每一条指令单独定义一个&lt;code&gt;wire&lt;/code&gt;型变量，再以这些变量为条件去编写控制信号的生成逻辑。&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;opcode&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;指令操作码&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;6&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;funct&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;功能码，用于区分操作类型&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;6&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;NPCOp&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;下一地址选择操作码&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;3&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;RegWrite&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;寄存器写使能信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;ALUOp&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;ALU操作码&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;3&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;MemWrite&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;内存写使能信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;ExtOp&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;立即数扩展操作选择信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;WAOp&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;写地址选择操作码&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;2&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;WDOp&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;写数据选择操作码&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;2&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;BOp&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;第二操作数选择信号&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h1 id=&#34;思考题&#34;&gt;思考题
-&lt;/h1&gt;&lt;ol&gt;
-&lt;li&gt;阅读下面给出的 DM 的输入示例中（示例 DM 容量为 4KB，即 32bit × 1024字），根据你的理解回答，这个 &lt;code&gt;addr&lt;/code&gt; 信号又是从哪里来的？地址信号 &lt;code&gt;addr&lt;/code&gt; 位数为什么是 [11:2] 而不是 [9:0] ？
-&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image.png&#34;
-	width=&#34;845&#34;
-	height=&#34;269&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu15649591888432985222.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu6653204169145448707.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;alt text&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;314&#34;
-		data-flex-basis=&#34;753px&#34;
-	
-&gt;
-答：&lt;code&gt;addr&lt;/code&gt;是ALU通过将寄存器值与偏移量&lt;code&gt;offset&lt;/code&gt;相加得到的地址信号，之所以取[11:2]是因为DM的存储是以32bit为单位，而地址信号是以8bit为单位，故略去后两位使地址信号与DM内的存储地址一致。&lt;/li&gt;
-&lt;li&gt;思考上述两种控制器设计的译码方式，给出代码示例，并尝试对比各方式的优劣
-答：指令对应的控制信号如何取值：
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-verilog&#34; data-lang=&#34;verilog&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;case&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;opcode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;     &lt;span class=&#34;mh&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b000000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;begin&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// R型指令，funct决定操作
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;         &lt;span class=&#34;k&#34;&gt;case&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;funct&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;             &lt;span class=&#34;mh&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b100000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;begin&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// add
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;                 &lt;span class=&#34;n&#34;&gt;RegWrite&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;ALUOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b000&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;WAOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b01&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;NPCOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;MemWrite&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;ExtOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;WDOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;BOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;             &lt;span class=&#34;k&#34;&gt;end&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;             &lt;span class=&#34;mh&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b100010&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;begin&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// sub
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;                 &lt;span class=&#34;n&#34;&gt;RegWrite&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;ALUOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b001&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;WAOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b01&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;NPCOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;MemWrite&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;ExtOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;WDOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                 &lt;span class=&#34;n&#34;&gt;BOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;             &lt;span class=&#34;k&#34;&gt;end&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;             &lt;span class=&#34;c1&#34;&gt;//略
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;         &lt;span class=&#34;k&#34;&gt;endcase&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;c1&#34;&gt;//略
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;endcase&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;控制信号每种取值时对应的指令：
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-verilog&#34; data-lang=&#34;verilog&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;NPCOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;beq&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b001&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;n&#34;&gt;jal&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b010&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;n&#34;&gt;jr&lt;/span&gt;  &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b011&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;RegWrite&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;add&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sub&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ori&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;lw&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;lui&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;jal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ALUOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;add&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;lw&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sw&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;n&#34;&gt;sub&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;beq&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b001&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;n&#34;&gt;ori&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b010&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;mh&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b111&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MemWrite&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sw&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ExtOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ori&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;WAOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;add&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sub&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;jr&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b01&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;               &lt;span class=&#34;n&#34;&gt;jal&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b10&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;               &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;WDOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;lw&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b01&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;               &lt;span class=&#34;n&#34;&gt;lui&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b10&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;               &lt;span class=&#34;n&#34;&gt;jal&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b11&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;               &lt;span class=&#34;mh&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mb&#34;&gt;&amp;#39;b0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;k&#34;&gt;assign&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;BOp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ori&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;lw&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sw&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;在相应的部件中，复位信号的设计都是同步复位，这与 P3 中的设计要求不同。请对比同步复位与异步复位这两种方式的 &lt;code&gt;reset&lt;/code&gt; 信号与 &lt;code&gt;clk&lt;/code&gt; 信号优先级的关系。
-答：同步复位中&lt;code&gt;clk&lt;/code&gt;信号优先级更高，只有&lt;code&gt;clk&lt;/code&gt;上升沿到来时&lt;code&gt;reset&lt;/code&gt;信号才有影响，而异步复位二者地位相当，二者都可以随时生效。&lt;/li&gt;
-&lt;li&gt;C 语言是一种弱类型程序设计语言。C 语言中不对计算结果溢出进行处理，这意味着 C 语言要求程序员必须很清楚计算结果是否会导致溢出。因此，如果仅仅支持 C 语言，MIPS 指令的所有计算指令均可以忽略溢出。 请说明为什么在忽略溢出的前提下，&lt;code&gt;addi&lt;/code&gt; 与 &lt;code&gt;addiu&lt;/code&gt; 是等价的，&lt;code&gt;add&lt;/code&gt; 与 &lt;code&gt;addu&lt;/code&gt; 是等价的。
-答：以&lt;code&gt;add&lt;/code&gt;与&lt;code&gt;addu&lt;/code&gt;为例，从RTL描述中可以看出，&lt;code&gt;addu&lt;/code&gt;就是在&lt;code&gt;add&lt;/code&gt;的基础上增加了如果运算结果最高位和次高位不相等就抛出报错，所以如果忽略这个溢出，二者就是等价的。&lt;code&gt;addi&lt;/code&gt;和&lt;code&gt;addiu&lt;/code&gt;同理。&lt;/li&gt;
 &lt;/ol&gt;
 </description>
         </item>
