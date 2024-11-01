@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>OO on Messmerr&#39;s Personal Blog</title>
+        <link>https://messmerr.github.io/categories/oo/</link>
+        <description>Recent content in OO on Messmerr&#39;s Personal Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>Messmerr</copyright>
+        <lastBuildDate>Fri, 01 Nov 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://messmerr.github.io/categories/oo/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>北航OOpre-课程总结</title>
+        <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAoopre-%E8%AF%BE%E7%A8%8B%E6%80%BB%E7%BB%93/</link>
+        <pubDate>Fri, 01 Nov 2024 00:00:00 +0000</pubDate>
+        
+        <guid>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAoopre-%E8%AF%BE%E7%A8%8B%E6%80%BB%E7%BB%93/</guid>
+        <description>&lt;img src="https://messmerr.github.io/123.webp" alt="Featured image of post 北航OOpre-课程总结" /&gt;&lt;hr&gt;
+&lt;h1 id=&#34;架构设计及考虑&#34;&gt;架构设计及考虑
+&lt;/h1&gt;&lt;h2 id=&#34;架构设计&#34;&gt;架构设计
+&lt;/h2&gt;&lt;h3 id=&#34;类图&#34;&gt;类图
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://messmerr.github.io/image.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+&gt;
+最终程序共有22个类，其组织方式如下。&lt;/p&gt;
+&lt;h3 id=&#34;mainclass&#34;&gt;MainClass
+&lt;/h3&gt;&lt;p&gt;程序入口，调用&lt;code&gt;Print&lt;/code&gt;进行输入解析。&lt;/p&gt;
+&lt;h3 id=&#34;print&#34;&gt;Print
+&lt;/h3&gt;&lt;p&gt;解析输入，随后调用各个方法实现功能。&lt;/p&gt;
+&lt;h3 id=&#34;adventure&#34;&gt;Adventure
+&lt;/h3&gt;&lt;p&gt;冒险者类，因为几乎所有操作都以冒险者为主体，所以大多数功能需要这个类参与实现。&lt;/p&gt;
+&lt;h3 id=&#34;fight&#34;&gt;Fight
+&lt;/h3&gt;&lt;p&gt;专门控制战斗的类。&lt;/p&gt;
+&lt;h3 id=&#34;employment&#34;&gt;Employment
+&lt;/h3&gt;&lt;p&gt;专门控制雇佣关系的类。&lt;/p&gt;
+&lt;h3 id=&#34;fragment&#34;&gt;Fragment
+&lt;/h3&gt;&lt;p&gt;专门控制碎片的类。&lt;/p&gt;
+&lt;h3 id=&#34;ce接口&#34;&gt;CE接口
+&lt;/h3&gt;&lt;p&gt;连接冒险者游戏中的所有实体对象（均有CE）：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Adventure&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Bottle&lt;/code&gt;父类
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;AtkBottle&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;DefBottle&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HpBottle&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Equipment&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;guard接口&#34;&gt;Guard接口
+&lt;/h3&gt;&lt;p&gt;连接所有工厂中的守卫：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Shd&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Flm&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Stn&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Wnd&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Frz&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;treasure接口&#34;&gt;Treasure接口
+&lt;/h3&gt;&lt;p&gt;连接所有守卫对应的宝物：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ShdTreasure&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;FlmTreasure&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;StnTreasure&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;WndTreasure&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;FrzTreasure&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;架构考虑&#34;&gt;架构考虑
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;在学习了&lt;strong&gt;继承和接口&lt;/strong&gt;之后，我重构了代码以增强类之间的逻辑关系，将各类药水瓶用父类形式实现，并使用&lt;strong&gt;接口&lt;/strong&gt;关联起了冒险者，武器和药水瓶。在此后的工厂中也使用了接口。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;对于复杂的功能，构造单独类来实现&lt;/strong&gt;，例如&lt;code&gt;Fight&lt;/code&gt;类，由于战斗过程复杂，单独提取出一个类，提高了代码的模块化程度。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;MainClass&lt;/code&gt;类只用来进入程序，随后就进入&lt;code&gt;Print&lt;/code&gt;类负责解析输入输出。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;junit心得体会&#34;&gt;Junit心得体会
+&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;Junit单元测试&lt;/strong&gt;是我们在OOpre课程中首次接触到的一种测试方法。他为我们提供了&lt;strong&gt;单独测试某个具体模块&lt;/strong&gt;的机会，当然这机会的出现&lt;strong&gt;也跟java自身面向对象的特点相适应&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;在进行Junit单元测试时，我们应该进行&lt;strong&gt;自下而上&lt;/strong&gt;的设计，先分别测试底层的功能能否正常实现，然后在确信底层无BUG的情况下去构造测试去测试更高层的方法，这样有利于我们快速把握问题所在。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;覆盖率是判断Junit测试有效程度的重要指标&lt;/strong&gt;，也是OOpre课程的要求，我们今后在编写java程序时，就算没有强制要求，也应该养成保证Junit覆盖率的习惯。因为没有被测到的边边角角是最容易滋生BUG的。&lt;/p&gt;
+&lt;h1 id=&#34;oopre心得体会&#34;&gt;OOpre心得体会
+&lt;/h1&gt;&lt;p&gt;刚开始学习OOpre的时候真的感觉非常新奇。因为&lt;strong&gt;面向对象编程的体验和此前完全不同&lt;/strong&gt;。别的不说，创建一个新类后光靠代码补全就啪啪啪敲出一大堆内容的感觉真的很爽。&lt;/p&gt;
+&lt;p&gt;不过到后期的迭代就老实了。此前我从来没有上过像OOpre这样的带有强测的课程。所以第一次需要修bug的时候真是死去活来，后面跟室友讨论才发现原来是重复携带上出了问题。不过最后一次倒是熟练了，找室友对拍了一下发现我的问题在于一次秘境探索比正常情况多闯了一关，找到对应的指令打个断点一看发现我居然携带了两个同id的药水瓶！具体问题出在哪就不说了，太丢脸。这个bug本该在第四次作业就暴露出来的。&lt;/p&gt;
+&lt;h1 id=&#34;建议&#34;&gt;建议
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;弱测可以稍微强一点点（）&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
