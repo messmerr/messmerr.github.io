@@ -7,7 +7,260 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>Messmerr</copyright>
-        <lastBuildDate>Fri, 15 Nov 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://messmerr.github.io/categories/co/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 28 Nov 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://messmerr.github.io/categories/co/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>北航CO_P7-MIPS微系统</title>
+        <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/</link>
+        <pubDate>Thu, 28 Nov 2024 00:00:00 +0000</pubDate>
+        
+        <guid>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/</guid>
+        <description>&lt;img src="https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/20241128135158.png" alt="Featured image of post 北航CO_P7-MIPS微系统" /&gt;&lt;hr&gt;
+&lt;h1 id=&#34;mips微系统设计方案&#34;&gt;MIPS微系统设计方案
+&lt;/h1&gt;&lt;h2 id=&#34;概述&#34;&gt;概述
+&lt;/h2&gt;&lt;p&gt;刚刚拿到实验教程的时候真的感到无从下手，不过在学长博客和gxpPPT的指引下还是解决了。这里贴出我用到的三个博客以示感谢。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://lazyfish-lc.github.io/2024/11/21/BUAA-CO-P7/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;北航CO 2024 P7课下部分个人理解分享 | Lazyfish &amp;amp; chilly_river&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://roife.github.io/posts/buaa-co-lab-p7/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;[BUAA-CO-Lab] P7 MIPS 微体系 | ROIFE BLOG&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://hyggge.github.io/2021/12/15/co/co-p7-mips-wei-xi-tong-yi-chang-zhong-duan/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;「BUAA-CO」P7_MIPS微系统（异常中断） | Hyggge&amp;rsquo;s Blog&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;搭建思路&#34;&gt;搭建思路
+&lt;/h2&gt;&lt;p&gt;P7要做的事情有些琐碎，因此选择一个良好的操作顺序非常重要，以下是我的工作流程。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;搭建CP0，建议放M级。&lt;/li&gt;
+&lt;li&gt;产生异常，设计出&lt;code&gt;ExcCode&lt;/code&gt;信号并随流水线传递到M级，注意课程组给出的条件，注意一条指令多个异常和多条指令同时异常的情况。&lt;/li&gt;
+&lt;li&gt;根据CP0的需求爆改流水线，包括但不限于
+&lt;ul&gt;
+&lt;li&gt;将CP0需要的已知信号统统流水传递过来，原本没有的（如表示当前指令是否为延迟槽指令的&lt;code&gt;BDIn&lt;/code&gt;）就生成出来。&lt;/li&gt;
+&lt;li&gt;在&lt;code&gt;Controller&lt;/code&gt;模块中加入四条新指令即&lt;code&gt;mfc0&lt;/code&gt;,&lt;code&gt;mtc0&lt;/code&gt;,&lt;code&gt;eret&lt;/code&gt;,&lt;code&gt;syscall&lt;/code&gt;。选择合适的控制信号，个人建议syscall和eret单独拉出来。&lt;/li&gt;
+&lt;li&gt;在CPU中以合适的方法建立四条新指令的数据通路。做这里的时候加吐我了，因为之前没有使用宏定义，导致很多之前不需要传递的信号都要传递。&lt;/li&gt;
+&lt;li&gt;处理冒险，&lt;code&gt;mfc0&lt;/code&gt;转发直接用原有的数据通路。阻塞则只需要加一条eret相关阻塞，处理mtc0对EPC进行写入的问题，&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;通过修改流水级寄存器和NPC完成异常中断的跳转和返回过程。这里我们把CP0产生的异常中断信号&lt;code&gt;req&lt;/code&gt;传给这些模块，将流水级寄存器除了&lt;code&gt;PC&lt;/code&gt;以外的内容置0，&lt;code&gt;PC&lt;/code&gt;置为&lt;code&gt;32&#39;h4180&lt;/code&gt;，并让NPC跳转到&lt;code&gt;32&#39;h4180&lt;/code&gt;处，注意对实验教程中提到的对乘除模块的处理。返回则是当eret产生时，NPC跳回EPC同时清空延迟槽（操作想必大家都知道，注意阻塞的情况）。&lt;/li&gt;
+&lt;li&gt;调整模块结构，规范化CPU的输入输出端口，并建立新的mips顶层模块，将CPU和课程组给的Timer放进去。&lt;/li&gt;
+&lt;li&gt;设计Bridge模块，这个模块在P7的作用仅仅是判断当前读写的是哪个外设并处理对应的信号，实现相当简单。&lt;/li&gt;
+&lt;li&gt;把线都连好，大功告成。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;功能模块设计&#34;&gt;功能模块设计
+&lt;/h2&gt;&lt;p&gt;挑出比较重要的新增模块。&lt;/p&gt;
+&lt;h3 id=&#34;cp0&#34;&gt;CP0
+&lt;/h3&gt;&lt;p&gt;值得一提的是内部，许多学长是直接定义了&lt;code&gt;IM&lt;/code&gt;,&lt;code&gt;EXL&lt;/code&gt;,&lt;code&gt;IE&lt;/code&gt;等寄存器，在写入时则用拼接的方式这是合理的，因为&lt;code&gt;SR&lt;/code&gt;,&lt;code&gt;Cause&lt;/code&gt;中的绝大部分位数没有用。当然，还可以使用在模块内用宏定义，具体怎么实现看个人喜好。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;clk&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;时钟信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;reset&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;复位信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;en&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;启用信号，控制CP0模块的操作&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;CP0Add&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;控制寄存器选择信号，指定访问的寄存器地址（5位）&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;CP0In&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;往CP0寄存器写入的数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;VPC&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;异常发生时的程序计数器值&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;BDIn&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;异常时的返回地址标志&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;ExcCodeIn&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;异常代码&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;5&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;HWInt&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;硬件中断请求信号（6位）&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;6&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;EXLClr&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;清除异常级别标志（用于清除SR[1]）&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;EPCOut&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;异常程序计数器（EPC）输出&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;CP0Out&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;读取的CP0寄存器值，根据CP0Add选择&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Req&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;异常或中断请求信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;bridge&#34;&gt;Bridge
+&lt;/h3&gt;&lt;p&gt;连个线，没啥可说的。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;信号名&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;方向&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;描述&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;位宽&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Addr&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;地址输入，决定访问的外设区域&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;byteen&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;字节使能信号，用于指示操作的字节&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;4&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;DM_RD&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;数据存储区读取数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;T0_RD&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;定时器0读取数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;T1_RD&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;input&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;定时器1读取数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;RD&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;输出数据，根据地址选择不同外设的读取数据&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;32&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;DM_WE&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;数据存储区写使能信号，根据地址选择是否写入数据存储区&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;4&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;T0_WE&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;定时器0写使能信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;T1_WE&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;定时器1写使能信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;int_WE&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;output&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;中断控制寄存器写使能信号&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;4&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;关于bug&#34;&gt;关于BUG
+&lt;/h2&gt;&lt;p&gt;P7真的很容易写出各种各样的BUG，所以自行测试的时候就很考验数据点编写的能力（虽然我大部分都是找别人要的）。但如果要自己编写测试点，建议先把每种类型的异常全部构造出对应的点，先检验有没有漏判的问题。随后认真观察波形图，分析一下进入异常处理程序后各寄存器的情况，以及是怎么跳转回去的，跳转回去各寄存器的情况又如何。理解好异常中断的处理过程对于找bug好处很大。&lt;/p&gt;
+&lt;p&gt;此外，评测机真的是好东西，cokiller帮我解决了大部分BUG，虽然最后还是漏了就是了。还有就是学长博客，以及多跟同学交流，很多BUG是共通的，例如空泡的问题。&lt;/p&gt;
+&lt;h1 id=&#34;测试方案&#34;&gt;测试方案
+&lt;/h1&gt;&lt;p&gt;之前P3的时候想着P4再搓评测机，到后面每天疲于奔命也没有自己搓了。
+于是我就自己写了一点巨弱的测试点，然后又找大佬要了一堆强力测试点。&lt;/p&gt;
+&lt;h1 id=&#34;思考题&#34;&gt;思考题
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;请查阅相关资料，说明鼠标和键盘的输入信号是如何被 CPU 知晓的？&lt;/strong&gt;
+答：鼠标和键盘的输入信号通过硬件接口（如PS/2、USB或蓝牙）传输到计算机。当按下键盘的某个按键时，它会发送一个扫描码；鼠标则发送位置和点击信号。这些信号通过设备驱动程序转化为操作系统可以理解的格式，操作系统通过中断或轮询方式接收这些信号，并将其传递给相应的应用程序。最终，CPU根据这些输入信号作出响应，例如显示字符或移动鼠标指针。整个过程依赖硬件接口、驱动程序、操作系统和中断机制的协作。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;请思考为什么我们的 CPU 处理中断异常必须是已经指定好的地址？如果你的 CPU 支持用户自定义入口地址，即处理中断异常的程序由用户提供，其还能提供我们所希望的功能吗？如果可以，请说明这样可能会出现什么问题？否则举例说明。（假设用户提供的中断处理程序合法）&lt;/strong&gt;
+答：因为这样可以简化设计，增加系统的稳定性和可靠性。可以提供，但是可能会出现增加安全性问题，因为用户可能会选择不够安全的入口。此外，不同程序采用不同的入口可能导致冲突，出现故障时也不容易排查Bug.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;为何与外设通信需要 Bridge？&lt;/strong&gt;
+答：因为在我们的设计中，CPU不需要知道外设的具体信息，只需要对程序指定的地址进行访问。这样符合高内聚低耦合的思想。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;请阅读官方提供的定时器源代码，阐述两种中断模式的异同，并分别针对每一种模式绘制状态移图。&lt;/strong&gt;
+答：区别是enable是否是自动赋值。
+&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/40d775c10a27c3170e8fe2f368afd6d.jpg&#34;
+	width=&#34;1279&#34;
+	height=&#34;1706&#34;
+	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/40d775c10a27c3170e8fe2f368afd6d_hu18111232926173772819.jpg 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/40d775c10a27c3170e8fe2f368afd6d_hu5218508276199665538.jpg 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;alt text&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;74&#34;
+		data-flex-basis=&#34;179px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;倘若中断信号流入的时候，在检测宏观 PC 的一级如果是一条空泡（你的 CPU 该级所有信息均为空）指令，此时会发生什么问题？在此例基础上请思考：在 P7 中，清空流水线产生的空泡指令应该保留原指令的哪些信息？&lt;/strong&gt;
+答：那么EPC会变成0，这样跳回时会引发错误。所以应该保留PC信息和本条指令是否是延迟槽的信息。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;为什么 jalr 指令为什么不能写成 jalr $31, $31？&lt;/strong&gt;
+答：因为我们处理延迟槽指令发生异常时EPC会指向跳转指令，因此从异常处理程序返回后跳转指令实际上总共被执行了两次，而&lt;code&gt;jalr&lt;/code&gt;具有累加效应，第二次执行的jalr和第一次是不一样的，所以会出错。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
         <title>北航CO_P6-verilog搭建三十条指令的五级流水线CPU</title>
         <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/</link>
         <pubDate>Fri, 15 Nov 2024 00:00:00 +0000</pubDate>
