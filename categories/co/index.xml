@@ -25,6 +25,9 @@
 &lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://hyggge.github.io/2021/12/15/co/co-p7-mips-wei-xi-tong-yi-chang-zhong-duan/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;「BUAA-CO」P7_MIPS微系统（异常中断） | Hyggge&amp;rsquo;s Blog&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;有一说一我觉得助教是刻意把教程弄成这样的。因为教程里都写了P7注重考验同学们的自主设计，并且在设计上给了同学们相当大的自由。不过我觉得还是改了为好。&lt;/p&gt;
+&lt;/blockquote&gt;
 &lt;h2 id=&#34;搭建思路&#34;&gt;搭建思路
 &lt;/h2&gt;&lt;p&gt;P7要做的事情有些琐碎，因此选择一个良好的操作顺序非常重要，以下是我的工作流程。&lt;/p&gt;
 &lt;ol&gt;
