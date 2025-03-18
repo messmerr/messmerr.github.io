@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+    <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content=" 单周期CPU设计方案 概述 本文使用logisim搭建了一个支持八条指令的MIPS架构CPU。开发过程首先分析所需指令的RTL，抽象出所需要的功能。然后分别建模并实现恰当的功能部件。再根据不同指令之间的关系合理地组建出简洁的数据通路。最后通过构建真值表构造控制器。\n">
 <title>北航CO_P3-logisim搭建单周期CPU</title>
 
-<link rel='canonical' href='http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/'>
+<link rel='canonical' href='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/'>
 
 <link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="北航CO_P3-logisim搭建单周期CPU">
 <meta property='og:description' content=" 单周期CPU设计方案 概述 本文使用logisim搭建了一个支持八条指令的MIPS架构CPU。开发过程首先分析所需指令的RTL，抽象出所需要的功能。然后分别建模并实现恰当的功能部件。再根据不同指令之间的关系合理地组建出简洁的数据通路。最后通过构建真值表构造控制器。\n">
-<meta property='og:url' content='http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/'>
+<meta property='og:url' content='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/'>
 <meta property='og:site_name' content='Messmerr&#39;s Personal Blog'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-10-23T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-10-23T00:00:00&#43;00:00'/><meta property='og:image' content='http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/pexels-jplenio-1105379.jpg' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-10-23T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-10-23T00:00:00&#43;00:00'/><meta property='og:image' content='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/pexels-jplenio-1105379.jpg' />
 <meta name="twitter:title" content="北航CO_P3-logisim搭建单周期CPU">
 <meta name="twitter:description" content=" 单周期CPU设计方案 概述 本文使用logisim搭建了一个支持八条指令的MIPS架构CPU。开发过程首先分析所需指令的RTL，抽象出所需要的功能。然后分别建模并实现恰当的功能部件。再根据不同指令之间的关系合理地组建出简洁的数据通路。最后通过构建真值表构造控制器。\n"><meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content='http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/pexels-jplenio-1105379.jpg' />
+    <meta name="twitter:image" content='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/pexels-jplenio-1105379.jpg' />
     </head>
     <body class="
     article-page

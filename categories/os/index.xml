@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>OS on Messmerr&#39;s Personal Blog</title>
-        <link>http://localhost:1313/categories/os/</link>
+        <link>https://messmerr.github.io/categories/os/</link>
         <description>Recent content in OS on Messmerr&#39;s Personal Blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>Messmerr</copyright>
-        <lastBuildDate>Mon, 10 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/os/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Mon, 10 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://messmerr.github.io/categories/os/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>OS-lab0 实验报告</title>
-        <link>http://localhost:1313/p/os-lab0-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link>
+        <link>https://messmerr.github.io/p/os-lab0-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link>
         <pubDate>Mon, 10 Mar 2025 00:00:00 +0000</pubDate>
         
-        <guid>http://localhost:1313/p/os-lab0-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid>
-        <description>&lt;img src="http://localhost:1313/the-creative-exchange-d2zvqp3fpro-unsplash.jpg" alt="Featured image of post OS-lab0 实验报告" /&gt;&lt;hr&gt;
+        <guid>https://messmerr.github.io/p/os-lab0-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid>
+        <description>&lt;img src="https://messmerr.github.io/p/os-lab0-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/the-creative-exchange-d2zvqp3fpro-unsplash.jpg" alt="Featured image of post OS-lab0 实验报告" /&gt;&lt;hr&gt;
 &lt;h1 id=&#34;os-lab0-实验报告&#34;&gt;OS-lab0 实验报告
 &lt;/h1&gt;&lt;h2 id=&#34;思考题&#34;&gt;思考题
 &lt;/h2&gt;&lt;h4 id=&#34;thinking-01&#34;&gt;Thinking-0.1

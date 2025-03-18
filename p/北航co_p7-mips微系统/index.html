@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+    <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content=" MIPS微系统设计方案 概述 刚刚拿到实验教程的时候真的感到无从下手，不过在学长博客和gxpPPT的指引下还是解决了。这里贴出我用到的三个博客以示感谢。\n北航CO 2024 P7课下部分个人理解分享 | Lazyfish &amp; chilly_river [BUAA-CO-Lab] P7 MIPS 微体系 | ROIFE BLOG 「BUAA-CO」P7_MIPS微系统（异常中断） | Hyggge&rsquo;s Blog 有一说一我觉得助教是刻意把教程弄成这样的。因为教程里都写了P7注重考验同学们的自主设计，并且在设计上给了同学们相当大的自由。不过我觉得还是改了为好。\n">
 <title>北航CO_P7-MIPS微系统</title>
 
-<link rel='canonical' href='http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/'>
+<link rel='canonical' href='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/'>
 
 <link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="北航CO_P7-MIPS微系统">
 <meta property='og:description' content=" MIPS微系统设计方案 概述 刚刚拿到实验教程的时候真的感到无从下手，不过在学长博客和gxpPPT的指引下还是解决了。这里贴出我用到的三个博客以示感谢。\n北航CO 2024 P7课下部分个人理解分享 | Lazyfish &amp; chilly_river [BUAA-CO-Lab] P7 MIPS 微体系 | ROIFE BLOG 「BUAA-CO」P7_MIPS微系统（异常中断） | Hyggge&rsquo;s Blog 有一说一我觉得助教是刻意把教程弄成这样的。因为教程里都写了P7注重考验同学们的自主设计，并且在设计上给了同学们相当大的自由。不过我觉得还是改了为好。\n">
-<meta property='og:url' content='http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/'>
+<meta property='og:url' content='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/'>
 <meta property='og:site_name' content='Messmerr&#39;s Personal Blog'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-11-28T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-11-28T00:00:00&#43;00:00'/><meta property='og:image' content='http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/20241128135158.png' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-11-28T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-11-28T00:00:00&#43;00:00'/><meta property='og:image' content='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/20241128135158.png' />
 <meta name="twitter:title" content="北航CO_P7-MIPS微系统">
 <meta name="twitter:description" content=" MIPS微系统设计方案 概述 刚刚拿到实验教程的时候真的感到无从下手，不过在学长博客和gxpPPT的指引下还是解决了。这里贴出我用到的三个博客以示感谢。\n北航CO 2024 P7课下部分个人理解分享 | Lazyfish &amp; chilly_river [BUAA-CO-Lab] P7 MIPS 微体系 | ROIFE BLOG 「BUAA-CO」P7_MIPS微系统（异常中断） | Hyggge&rsquo;s Blog 有一说一我觉得助教是刻意把教程弄成这样的。因为教程里都写了P7注重考验同学们的自主设计，并且在设计上给了同学们相当大的自由。不过我觉得还是改了为好。\n"><meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content='http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/20241128135158.png' />
+    <meta name="twitter:image" content='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/20241128135158.png' />
     </head>
     <body class="
     article-page
