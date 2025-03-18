@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
-    <head><meta charset='utf-8'>
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content=" 流水线CPU设计方案 概述 没想到P6意料之外的很轻松，只要加指令就行了，而这一届课程组给的指令巨好写，只有一个乘除模块需要花点时间。\n指令说明 本次在P5包含的指令基础上增加了十八条指令（这也太少了，感动）。\n">
 <title>北航CO_P6-verilog搭建三十条指令的五级流水线CPU</title>
 
-<link rel='canonical' href='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/'>
+<link rel='canonical' href='http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/'>
 
 <link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="北航CO_P6-verilog搭建三十条指令的五级流水线CPU">
 <meta property='og:description' content=" 流水线CPU设计方案 概述 没想到P6意料之外的很轻松，只要加指令就行了，而这一届课程组给的指令巨好写，只有一个乘除模块需要花点时间。\n指令说明 本次在P5包含的指令基础上增加了十八条指令（这也太少了，感动）。\n">
-<meta property='og:url' content='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/'>
+<meta property='og:url' content='http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/'>
 <meta property='og:site_name' content='Messmerr&#39;s Personal Blog'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-11-15T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-11-15T00:00:00&#43;00:00'/><meta property='og:image' content='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/david-becker-F8c-KXMxnzk-unsplash.jpg' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-11-15T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-11-15T00:00:00&#43;00:00'/><meta property='og:image' content='http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/david-becker-F8c-KXMxnzk-unsplash.jpg' />
 <meta name="twitter:title" content="北航CO_P6-verilog搭建三十条指令的五级流水线CPU">
 <meta name="twitter:description" content=" 流水线CPU设计方案 概述 没想到P6意料之外的很轻松，只要加指令就行了，而这一届课程组给的指令巨好写，只有一个乘除模块需要花点时间。\n指令说明 本次在P5包含的指令基础上增加了十八条指令（这也太少了，感动）。\n"><meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content='https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/david-becker-F8c-KXMxnzk-unsplash.jpg' />
+    <meta name="twitter:image" content='http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/david-becker-F8c-KXMxnzk-unsplash.jpg' />
     </head>
     <body class="
     article-page

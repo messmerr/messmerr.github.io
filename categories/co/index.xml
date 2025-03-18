@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>CO on Messmerr&#39;s Personal Blog</title>
-        <link>https://messmerr.github.io/categories/co/</link>
+        <link>http://localhost:1313/categories/co/</link>
         <description>Recent content in CO on Messmerr&#39;s Personal Blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>Messmerr</copyright>
-        <lastBuildDate>Thu, 28 Nov 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://messmerr.github.io/categories/co/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 28 Nov 2024 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/co/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>北航CO_P7-MIPS微系统</title>
-        <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/</link>
+        <link>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/</link>
         <pubDate>Thu, 28 Nov 2024 00:00:00 +0000</pubDate>
         
-        <guid>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/</guid>
-        <description>&lt;img src="https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/20241128135158.png" alt="Featured image of post 北航CO_P7-MIPS微系统" /&gt;&lt;hr&gt;
+        <guid>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/</guid>
+        <description>&lt;img src="http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/20241128135158.png" alt="Featured image of post 北航CO_P7-MIPS微系统" /&gt;&lt;hr&gt;
 &lt;h1 id=&#34;mips微系统设计方案&#34;&gt;MIPS微系统设计方案
 &lt;/h1&gt;&lt;h2 id=&#34;概述&#34;&gt;概述
 &lt;/h2&gt;&lt;p&gt;刚刚拿到实验教程的时候真的感到无从下手，不过在学长博客和gxpPPT的指引下还是解决了。这里贴出我用到的三个博客以示感谢。&lt;/p&gt;
@@ -237,10 +237,10 @@
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;请阅读官方提供的定时器源代码，阐述两种中断模式的异同，并分别针对每一种模式绘制状态移图。&lt;/strong&gt;
 答：区别是enable是否是自动赋值。
-&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/40d775c10a27c3170e8fe2f368afd6d.jpg&#34;
+&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/40d775c10a27c3170e8fe2f368afd6d.jpg&#34;
 	width=&#34;1279&#34;
 	height=&#34;1706&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/40d775c10a27c3170e8fe2f368afd6d_hu18111232926173772819.jpg 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/40d775c10a27c3170e8fe2f368afd6d_hu5218508276199665538.jpg 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/40d775c10a27c3170e8fe2f368afd6d_hu18111232926173772819.jpg 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p7-mips%E5%BE%AE%E7%B3%BB%E7%BB%9F/40d775c10a27c3170e8fe2f368afd6d_hu5218508276199665538.jpg 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -265,11 +265,11 @@
         </item>
         <item>
         <title>北航CO_P6-verilog搭建三十条指令的五级流水线CPU</title>
-        <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/</link>
+        <link>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/</link>
         <pubDate>Fri, 15 Nov 2024 00:00:00 +0000</pubDate>
         
-        <guid>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/</guid>
-        <description>&lt;img src="https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/david-becker-F8c-KXMxnzk-unsplash.jpg" alt="Featured image of post 北航CO_P6-verilog搭建三十条指令的五级流水线CPU" /&gt;&lt;hr&gt;
+        <guid>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/</guid>
+        <description>&lt;img src="http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p6-verilog%E6%90%AD%E5%BB%BA%E4%B8%89%E5%8D%81%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/david-becker-F8c-KXMxnzk-unsplash.jpg" alt="Featured image of post 北航CO_P6-verilog搭建三十条指令的五级流水线CPU" /&gt;&lt;hr&gt;
 &lt;h1 id=&#34;流水线cpu设计方案&#34;&gt;流水线CPU设计方案
 &lt;/h1&gt;&lt;h2 id=&#34;概述&#34;&gt;概述
 &lt;/h2&gt;&lt;p&gt;没想到P6意料之外的很轻松，只要加指令就行了，而这一届课程组给的指令巨好写，只有一个乘除模块需要花点时间。&lt;/p&gt;
@@ -666,11 +666,11 @@
         </item>
         <item>
         <title>北航CO_P5-verilog搭建五级流水线CPU</title>
-        <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p5-verilog%E6%90%AD%E5%BB%BA%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/</link>
+        <link>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p5-verilog%E6%90%AD%E5%BB%BA%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/</link>
         <pubDate>Sun, 10 Nov 2024 00:00:00 +0000</pubDate>
         
-        <guid>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p5-verilog%E6%90%AD%E5%BB%BA%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/</guid>
-        <description>&lt;img src="https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p5-verilog%E6%90%AD%E5%BB%BA%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/domenico-loia-hGV2TfOh0ns-unsplash.jpg" alt="Featured image of post 北航CO_P5-verilog搭建五级流水线CPU" /&gt;&lt;hr&gt;
+        <guid>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p5-verilog%E6%90%AD%E5%BB%BA%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/</guid>
+        <description>&lt;img src="http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p5-verilog%E6%90%AD%E5%BB%BA%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BFcpu/domenico-loia-hGV2TfOh0ns-unsplash.jpg" alt="Featured image of post 北航CO_P5-verilog搭建五级流水线CPU" /&gt;&lt;hr&gt;
 &lt;h1 id=&#34;流水线cpu设计方案&#34;&gt;流水线CPU设计方案
 &lt;/h1&gt;&lt;h2 id=&#34;概述&#34;&gt;概述
 &lt;/h2&gt;&lt;p&gt;本次课下我根据P4的代码进行了大规模重构，加入了五级流水线寄存器和转发的控制通路，最后针对转发和阻塞编写了冒险处理模块。&lt;/p&gt;
@@ -2450,11 +2450,11 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
         </item>
         <item>
         <title>北航CO_P4-verilog搭建单周期CPU</title>
-        <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</link>
+        <link>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</link>
         <pubDate>Thu, 31 Oct 2024 00:00:00 +0000</pubDate>
         
-        <guid>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</guid>
-        <description>&lt;img src="https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/growtika-P5mCQ4KACbM-unsplash.jpg" alt="Featured image of post 北航CO_P4-verilog搭建单周期CPU" /&gt;&lt;hr&gt;
+        <guid>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</guid>
+        <description>&lt;img src="http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/growtika-P5mCQ4KACbM-unsplash.jpg" alt="Featured image of post 北航CO_P4-verilog搭建单周期CPU" /&gt;&lt;hr&gt;
 &lt;h1 id=&#34;单周期cpu设计方案&#34;&gt;单周期CPU设计方案
 &lt;/h1&gt;&lt;h2 id=&#34;概述&#34;&gt;概述
 &lt;/h2&gt;&lt;p&gt;本次课下主要依靠P3的logisim进行翻译，不过我也对P3设计的一系列不合理之处进行了调整。我首先根据logisim电路图搭建各个模块，随后在mips.v文件中把各个模块合理地连接起来，最后添加controller模块产生控制信号。&lt;/p&gt;
@@ -2948,10 +2948,10 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 &lt;h1 id=&#34;思考题&#34;&gt;思考题
 &lt;/h1&gt;&lt;ol&gt;
 &lt;li&gt;阅读下面给出的 DM 的输入示例中（示例 DM 容量为 4KB，即 32bit × 1024字），根据你的理解回答，这个 &lt;code&gt;addr&lt;/code&gt; 信号又是从哪里来的？地址信号 &lt;code&gt;addr&lt;/code&gt; 位数为什么是 [11:2] 而不是 [9:0] ？
-&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image.png&#34;
+&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image.png&#34;
 	width=&#34;845&#34;
 	height=&#34;269&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu15649591888432985222.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu6653204169145448707.png 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu15649591888432985222.png 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p4-verilog%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu6653204169145448707.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -3080,11 +3080,11 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
         </item>
         <item>
         <title>北航CO_P3-logisim搭建单周期CPU</title>
-        <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</link>
+        <link>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</link>
         <pubDate>Wed, 23 Oct 2024 00:00:00 +0000</pubDate>
         
-        <guid>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</guid>
-        <description>&lt;img src="https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/pexels-jplenio-1105379.jpg" alt="Featured image of post 北航CO_P3-logisim搭建单周期CPU" /&gt;&lt;hr&gt;
+        <guid>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/</guid>
+        <description>&lt;img src="http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/pexels-jplenio-1105379.jpg" alt="Featured image of post 北航CO_P3-logisim搭建单周期CPU" /&gt;&lt;hr&gt;
 &lt;h1 id=&#34;单周期cpu设计方案&#34;&gt;单周期CPU设计方案
 &lt;/h1&gt;&lt;h2 id=&#34;概述&#34;&gt;概述
 &lt;/h2&gt;&lt;p&gt;本文使用logisim搭建了一个支持八条指令的MIPS架构CPU。开发过程首先分析所需指令的RTL，抽象出所需要的功能。然后分别建模并实现恰当的功能部件。再根据不同指令之间的关系合理地组建出简洁的数据通路。最后通过构建真值表构造控制器。&lt;/p&gt;
@@ -3350,10 +3350,10 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 &lt;blockquote&gt;
 &lt;p&gt;图是gxp老师课件上的，实际电路NPC应该有几根线&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image.png&#34;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image.png&#34;
 	width=&#34;259&#34;
 	height=&#34;205&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu1257119938015792967.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu17176869396698944874.png 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu1257119938015792967.png 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image_hu17176869396698944874.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -3366,10 +3366,10 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 &gt;&lt;/p&gt;
 &lt;h3 id=&#34;指令分解&#34;&gt;指令分解
 &lt;/h3&gt;&lt;p&gt;纯粹体力劳动，把所有可能出现的指令部分全部分离出来。
-&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-1.png&#34;
+&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-1.png&#34;
 	width=&#34;447&#34;
 	height=&#34;263&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-1_hu8684917992346940111.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-1_hu8989696047024708657.png 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-1_hu8684917992346940111.png 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-1_hu8989696047024708657.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -3383,10 +3383,10 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 &lt;h3 id=&#34;addu--subu&#34;&gt;ADDU &amp;amp; SUBU
 &lt;/h3&gt;&lt;p&gt;最基础的指令，其他指令基本都是通过扩充这一部分的电路。
 电路中rs、rt、rd分别给出读写指令，将运算的结果写入rd对应的寄存器中。
-&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-2.png&#34;
+&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-2.png&#34;
 	width=&#34;375&#34;
 	height=&#34;235&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-2_hu9688860742562248011.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-2_hu9898298850582058437.png 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-2_hu9688860742562248011.png 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-2_hu9898298850582058437.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -3399,10 +3399,10 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 &gt;&lt;/p&gt;
 &lt;h3 id=&#34;ori&#34;&gt;ORI
 &lt;/h3&gt;&lt;p&gt;这一段稍微需要注意一下RTL。
-&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/98d4648655182408d1449d73a0d1de9.png&#34;
+&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/98d4648655182408d1449d73a0d1de9.png&#34;
 	width=&#34;859&#34;
 	height=&#34;364&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/98d4648655182408d1449d73a0d1de9_hu6089035281481330811.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/98d4648655182408d1449d73a0d1de9_hu15143189203310304875.png 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/98d4648655182408d1449d73a0d1de9_hu6089035281481330811.png 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/98d4648655182408d1449d73a0d1de9_hu15143189203310304875.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -3414,10 +3414,10 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 	
 &gt;
 由RTL知，我们要把立即数imm16作零扩展到32位后再参与或运算。同时，注意到这里需要输入GRF和ALU模块的信号与上面不同。rt作为了被写入的寄存器，同时进行运算的一个寄存器被换成了立即数。所以要在A3和B接口前使用MUX进行信号选择。每一次出现这类情况我们都用一个标签作为控制信号，最后使用打表方式一次性生成各指令的控制信号。
-&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-3.png&#34;
+&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-3.png&#34;
 	width=&#34;425&#34;
 	height=&#34;334&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-3_hu7305957060314092148.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-3_hu8727959061812780460.png 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-3_hu7305957060314092148.png 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-3_hu8727959061812780460.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -3429,10 +3429,10 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 	
 &gt;&lt;/p&gt;
 &lt;h3 id=&#34;lw&#34;&gt;LW
-&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-4.png&#34;
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-4.png&#34;
 	width=&#34;1068&#34;
 	height=&#34;378&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-4_hu6443185353931928984.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-4_hu9297083337520267099.png 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-4_hu6443185353931928984.png 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-4_hu9297083337520267099.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -3444,10 +3444,10 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 	
 &gt;
 首次出现了要对DM进行操作的指令。此时ALU的输出作为读DM的地址，DM的输出被写入对应寄存器中。此外，这里需要对立即数imm16进行的是有符号扩展，所以对EXT也要进行信号选择。
-&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-5.png&#34;
+&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-5.png&#34;
 	width=&#34;468&#34;
 	height=&#34;328&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-5_hu8867463498713777001.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-5_hu7130255315357254439.png 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-5_hu8867463498713777001.png 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-5_hu7130255315357254439.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -3459,10 +3459,10 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 	
 &gt;&lt;/p&gt;
 &lt;h3 id=&#34;sw&#34;&gt;SW
-&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/2e7fa4342d573f3942ad6a7ca10dded.png&#34;
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/2e7fa4342d573f3942ad6a7ca10dded.png&#34;
 	width=&#34;1102&#34;
 	height=&#34;462&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/2e7fa4342d573f3942ad6a7ca10dded_hu14048915399541119807.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/2e7fa4342d573f3942ad6a7ca10dded_hu15226301040041250481.png 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/2e7fa4342d573f3942ad6a7ca10dded_hu14048915399541119807.png 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/2e7fa4342d573f3942ad6a7ca10dded_hu15226301040041250481.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -3474,10 +3474,10 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 	
 &gt;
 写入而非读取，只需要加一个输入的数据信号和读/写控制信号即可。
-&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-6.png&#34;
+&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-6.png&#34;
 	width=&#34;495&#34;
 	height=&#34;339&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-6_hu12203084715352990761.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-6_hu8306275428917290872.png 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-6_hu12203084715352990761.png 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-6_hu8306275428917290872.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -3490,10 +3490,10 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 &gt;&lt;/p&gt;
 &lt;h3 id=&#34;beq&#34;&gt;BEQ
 &lt;/h3&gt;&lt;p&gt;这一部分的逻辑主要是在NPC中完成的，此外只需要利用ALU的减法产生一个判断A、B是否相等的信号即可。
-&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-7.png&#34;
+&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-7.png&#34;
 	width=&#34;490&#34;
 	height=&#34;337&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-7_hu6149330859689517399.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-7_hu13825922559627414455.png 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-7_hu6149330859689517399.png 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-7_hu13825922559627414455.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -3506,10 +3506,10 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 &gt;&lt;/p&gt;
 &lt;h3 id=&#34;lui&#34;&gt;LUI
 &lt;/h3&gt;&lt;p&gt;唯一老师上课没讲的指令，所以白嫖不了结构图了（悲伤）。
-&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/1a301a36ed4a4c9039f80669e96792d.png&#34;
+&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/1a301a36ed4a4c9039f80669e96792d.png&#34;
 	width=&#34;979&#34;
 	height=&#34;382&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/1a301a36ed4a4c9039f80669e96792d_hu1283075729208184123.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/1a301a36ed4a4c9039f80669e96792d_hu549884947335130086.png 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/1a301a36ed4a4c9039f80669e96792d_hu1283075729208184123.png 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/1a301a36ed4a4c9039f80669e96792d_hu549884947335130086.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -3527,10 +3527,10 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 &lt;p&gt;有人可能会问和逻辑呢？因为我用的是比较器所以省略掉了hhh。
 跟上面的信号名不完全一样，仅供参考。&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;img src=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-8.png&#34;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-8.png&#34;
 	width=&#34;1878&#34;
 	height=&#34;1171&#34;
-	srcset=&#34;https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-8_hu14412514712159542525.png 480w, https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-8_hu9092032242994337340.png 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-8_hu14412514712159542525.png 480w, http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p3-logisim%E6%90%AD%E5%BB%BA%E5%8D%95%E5%91%A8%E6%9C%9Fcpu/image-8_hu9092032242994337340.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;alt text&#34;
@@ -3731,11 +3731,11 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
         </item>
         <item>
         <title>北航CO_P0课上——logisim的基础运用</title>
-        <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Alogisim%E7%9A%84%E5%9F%BA%E7%A1%80%E8%BF%90%E7%94%A8/</link>
+        <link>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Alogisim%E7%9A%84%E5%9F%BA%E7%A1%80%E8%BF%90%E7%94%A8/</link>
         <pubDate>Tue, 01 Oct 2024 00:00:00 +0000</pubDate>
         
-        <guid>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Alogisim%E7%9A%84%E5%9F%BA%E7%A1%80%E8%BF%90%E7%94%A8/</guid>
-        <description>&lt;img src="https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Alogisim%E7%9A%84%E5%9F%BA%E7%A1%80%E8%BF%90%E7%94%A8/pawel-czerwinski-8uZPynIu-rQ-unsplash.jpg" alt="Featured image of post 北航CO_P0课上——logisim的基础运用" /&gt;&lt;hr&gt;
+        <guid>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Alogisim%E7%9A%84%E5%9F%BA%E7%A1%80%E8%BF%90%E7%94%A8/</guid>
+        <description>&lt;img src="http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Alogisim%E7%9A%84%E5%9F%BA%E7%A1%80%E8%BF%90%E7%94%A8/pawel-czerwinski-8uZPynIu-rQ-unsplash.jpg" alt="Featured image of post 北航CO_P0课上——logisim的基础运用" /&gt;&lt;hr&gt;
 &lt;p&gt;昨天晚上进行了&lt;strong&gt;计组P0&lt;/strong&gt;的上机，&lt;strong&gt;他不是普通的上机，是国庆前夜的上机，是计组第一次影响分数的上机，这里除了6系牛马，没人配与他单挑。&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;在去之前，我是十分焦虑的。这主要是&lt;strong&gt;北航CO&lt;/strong&gt;的低容错所致：&lt;/p&gt;
 &lt;ul&gt;
@@ -3768,11 +3768,11 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
         </item>
         <item>
         <title>北航CO_P0课下——FSM</title>
-        <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Bfsm/</link>
+        <link>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Bfsm/</link>
         <pubDate>Thu, 26 Sep 2024 19:32:28 +0800</pubDate>
         
-        <guid>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Bfsm/</guid>
-        <description>&lt;img src="https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Bfsm/matt-le-SJSpo9hQf7s-unsplash.jpg" alt="Featured image of post 北航CO_P0课下——FSM" /&gt;&lt;hr&gt;
+        <guid>http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Bfsm/</guid>
+        <description>&lt;img src="http://localhost:1313/p/%E5%8C%97%E8%88%AAco_p0%E8%AF%BE%E4%B8%8Bfsm/matt-le-SJSpo9hQf7s-unsplash.jpg" alt="Featured image of post 北航CO_P0课下——FSM" /&gt;&lt;hr&gt;
 &lt;h1 id=&#34;fsm&#34;&gt;FSM
 &lt;/h1&gt;&lt;p&gt;这一题题干是检测是否输入的字符串是否符合给定的格式。&lt;/p&gt;
 &lt;blockquote&gt;
@@ -3816,11 +3816,11 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
         </item>
         <item>
         <title>北航CO上机初体验</title>
-        <link>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco%E4%B8%8A%E6%9C%BA%E5%88%9D%E4%BD%93%E9%AA%8C/</link>
+        <link>http://localhost:1313/p/%E5%8C%97%E8%88%AAco%E4%B8%8A%E6%9C%BA%E5%88%9D%E4%BD%93%E9%AA%8C/</link>
         <pubDate>Tue, 24 Sep 2024 12:10:01 +0800</pubDate>
         
-        <guid>https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco%E4%B8%8A%E6%9C%BA%E5%88%9D%E4%BD%93%E9%AA%8C/</guid>
-        <description>&lt;img src="https://messmerr.github.io/p/%E5%8C%97%E8%88%AAco%E4%B8%8A%E6%9C%BA%E5%88%9D%E4%BD%93%E9%AA%8C/the-creative-exchange-d2zvqp3fpro-unsplash.jpg" alt="Featured image of post 北航CO上机初体验" /&gt;&lt;hr&gt;
+        <guid>http://localhost:1313/p/%E5%8C%97%E8%88%AAco%E4%B8%8A%E6%9C%BA%E5%88%9D%E4%BD%93%E9%AA%8C/</guid>
+        <description>&lt;img src="http://localhost:1313/p/%E5%8C%97%E8%88%AAco%E4%B8%8A%E6%9C%BA%E5%88%9D%E4%BD%93%E9%AA%8C/the-creative-exchange-d2zvqp3fpro-unsplash.jpg" alt="Featured image of post 北航CO上机初体验" /&gt;&lt;hr&gt;
 &lt;p&gt;花了好几个小时总算把&lt;strong&gt;个人博客&lt;/strong&gt;搭好了。至于为什么要搭这个博客，只能说人终究是从众的生物，当你看到那么多&lt;strong&gt;6系大佬&lt;/strong&gt;都有自己的博客，难免会想着自己搭一个。&lt;/p&gt;
 &lt;p&gt;此外，有一说一昨天的&lt;strong&gt;CO上机&lt;/strong&gt;真是一场灾难&lt;/p&gt;
 &lt;h3 id=&#34;考试机制&#34;&gt;考试机制
@@ -3832,7 +3832,7 @@ Tnew表示数据还有多长时间产生，会随着数据的流水动态的减�
 &lt;li&gt;&lt;strong&gt;电脑自带程序相当有限，我的vscode上配置了基础的C环境，有verilog插件和Markdown插件，然而听有些人说他们的vscode连verilog插件都没有，语法不熟悉就直接寄&lt;/strong&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;这次的考试机制是总时长&lt;strong&gt;三小时&lt;/strong&gt;，其中前两个小时纯自己做，最后一个小时发出提示文件，还可以向助教提问，&lt;strong&gt;三道题都AC之后&lt;/strong&gt;可以点击交卷，随后助教就会过来提几个问题（&lt;em&gt;然而我因为交卷太晚助教让我直接走&lt;/em&gt;），结束之后就可以离开了。令人惊讶的是这次上机只要在三个小时内AK，&lt;strong&gt;课程平台上就一律算通过&lt;/strong&gt;，于是像我这种三道题全是最后一小时AC的大混子也有个通过标。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://messmerr.github.io/images/blog/image.png&#34;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/blog/image.png&#34;
 	
 	
 	
