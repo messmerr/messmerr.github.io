@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content=" OS-SWAP 实验报告 前言 个人感觉SWAP相比Shell来说要不友好一些，因为很难有循序渐进的正反馈，做题的大部分时间都在对着各种报错痛苦地干瞪眼。本次任务我分了两段时间做，一次是考军理之前，花了两天整的时间企图给他速通掉，结果最后被一个顽固的bug击败，选择先复习。然后是24号考完马原之后又做了一天半，最后才完成。\n">
+<title>OS-SWAP 实验报告</title>
+
+<link rel='canonical' href='https://messmerr.github.io/p/os-swap-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="OS-SWAP 实验报告">
+<meta property='og:description' content=" OS-SWAP 实验报告 前言 个人感觉SWAP相比Shell来说要不友好一些，因为很难有循序渐进的正反馈，做题的大部分时间都在对着各种报错痛苦地干瞪眼。本次任务我分了两段时间做，一次是考军理之前，花了两天整的时间企图给他速通掉，结果最后被一个顽固的bug击败，选择先复习。然后是24号考完马原之后又做了一天半，最后才完成。\n">
+<meta property='og:url' content='https://messmerr.github.io/p/os-swap-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/'>
+<meta property='og:site_name' content='Messmerr&#39;s Personal Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-06-26T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-06-26T00:00:00&#43;00:00'/><meta property='og:image' content='https://messmerr.github.io/p/os-swap-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/domenico-loia-hGV2TfOh0ns-unsplash.jpg' />
+<meta name="twitter:title" content="OS-SWAP 实验报告">
+<meta name="twitter:description" content=" OS-SWAP 实验报告 前言 个人感觉SWAP相比Shell来说要不友好一些，因为很难有循序渐进的正反馈，做题的大部分时间都在对着各种报错痛苦地干瞪眼。本次任务我分了两段时间做，一次是考军理之前，花了两天整的时间企图给他速通掉，结果最后被一个顽固的bug击败，选择先复习。然后是24号考完马原之后又做了一天半，最后才完成。\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://messmerr.github.io/p/os-swap-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/domenico-loia-hGV2TfOh0ns-unsplash.jpg' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu2167423299004510128.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😅</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Messmerr&#39;s Personal Blog</a></h1>
+            <h2 class="site-description">我不想学计组啊，你们有没有这样的计组啊</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/172832935'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-brand-bilibili"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 10a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v6a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4v-6z" /><path d="M8 3l2 3" /><path d="M16 3l-2 3" /><path d="M9 13v-2" /><path d="M15 11v2" /></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/messmerr'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com/Jeppard887'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E6%83%85%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友情链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#题目分解">题目分解</a>
+      <ol>
+        <li><a href="#工作内容">工作内容</a></li>
+        <li><a href="#一些注意事项">一些注意事项</a></li>
+      </ol>
+    </li>
+    <li><a href="#具体实现">具体实现</a>
+      <ol>
+        <li><a href="#数据结构扩展">数据结构扩展</a></li>
+        <li><a href="#lru算法实现">LRU算法实现</a></li>
+        <li><a href="#swap磁盘管理">SWAP磁盘管理</a></li>
+        <li><a href="#页面换出实现">页面换出实现</a></li>
+        <li><a href="#页面换入实现">页面换入实现</a></li>
+        <li><a href="#tlb重填优化">TLB重填优化</a></li>
+        <li><a href="#cow机制兼容性">COW机制兼容性</a></li>
+      </ol>
+    </li>
+    <li><a href="#性能优化要点">性能优化要点</a>
+      <ol>
+        <li><a href="#1-tlb刷新优化">1. TLB刷新优化</a></li>
+        <li><a href="#2-磁盘访问优化">2. 磁盘访问优化</a></li>
+        <li><a href="#3-内存管理优化">3. 内存管理优化</a></li>
+      </ol>
+    </li>
+    <li><a href="#大模型使用">大模型使用</a></li>
+    <li><a href="#感想">感想</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/os-swap-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/">
+                <img src="/p/os-swap-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/domenico-loia-hGV2TfOh0ns-unsplash_hu7679236904244285819.jpg"
+                        srcset="/p/os-swap-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/domenico-loia-hGV2TfOh0ns-unsplash_hu7679236904244285819.jpg 800w, /p/os-swap-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/domenico-loia-hGV2TfOh0ns-unsplash_hu1245570073904995519.jpg 1600w"
+                        width="800" 
+                        height="533" 
+                        loading="lazy"
+                        alt="Featured image of post OS-SWAP 实验报告" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/os/" >
+                OS
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/os-swap-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/">OS-SWAP 实验报告</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jun 26, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 8 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <hr>
+<h1 id="os-swap-实验报告">OS-SWAP 实验报告
+</h1><h2 id="前言">前言
+</h2><p>个人感觉SWAP相比Shell来说要不友好一些，因为很难有循序渐进的正反馈，做题的大部分时间都在对着各种报错痛苦地干瞪眼。本次任务我分了两段时间做，一次是考军理之前，花了两天整的时间企图给他速通掉，结果最后被一个顽固的bug击败，选择先复习。然后是24号考完马原之后又做了一天半，最后才完成。</p>
+<p>题目要求基于自己的lab6进行迭代，实现一套页面置换（SWAP）机制。该实现采用Linux风格的LRU（Least Recently Used）算法，通过维护active_list和inactive_list两个双向链表来管理物理页面的访问频率，并在物理内存不足时将页面换出到磁盘，在访问时自动换入。</p>
+<h2 id="题目分解">题目分解
+</h2><h3 id="工作内容">工作内容
+</h3><ol>
+<li><strong>LRU算法实现</strong>：正确维护active_list和inactive_list双向链表，跟踪页面访问模式</li>
+<li><strong>SWAP操作</strong>：为内核创建访问磁盘的接口，实现swap_out和swap_in操作，管理磁盘存储</li>
+<li><strong>COW兼容性</strong>：确保SWAP机制与Copy-On-Write机制正确协作</li>
+<li><strong>性能优化</strong>：避免频繁的TLB刷新，优化磁盘访问</li>
+</ol>
+<h3 id="一些注意事项">一些注意事项
+</h3><ul>
+<li>MIPS R4K没有硬件访问位，需要通过软件TLB重填模拟。记得考虑奇偶页的问题。</li>
+<li>页表项需要同时支持COW、SWAP等多种状态</li>
+<li>注意换出页面的状态保存和恢复</li>
+<li>确保系统稳定性，避免页表等关键页面被换出</li>
+</ul>
+<h2 id="具体实现">具体实现
+</h2><h3 id="数据结构扩展">数据结构扩展
+</h3><p>为了支持功能，我对核心数据结构进行了扩展。</p>
+<p>首先，扩展了<code>Page</code>结构体。这部分基本按照题目来就好，例如新增页面标志位（<code>pp_flags</code>），其中我使用的有<code>PG_REFERENCED</code>用于标记页面近期是否被访问，<code>PG_PINNED</code>用于“钉住”关键页面防止被换出，以及后期做性能优化的时候我临时追加了<code>PG_ACTIVE</code>和<code>PG_INACTIVE</code>用于标识页面当前所在的LRU链表，避免每次都遍历。</p>
+<p>同时，为了在换出页面时能找到所有指向它的页表项（PTE），每个<code>Page</code>结构体维护一个<code>Pte_list</code>链表，链表中的每个节点<code>PteNode</code>都包含一个指向PTE的指针、该PTE对应的虚拟地址以及地址空间ID（ASID）。这样，当一个物理页需要被换出时，可以遍历这个链表，修改所有相关的PTE。</p>
+<p>此外，当一个页面被换出到磁盘后，其在<code>Page</code>结构体中保存的状态（如引用计数<code>pp_ref</code>和页表项链表<code>pp_pte_list</code>）需要被保留。为此，我也是用了题目推荐的状态管理结构<code>PageState</code>，并创建了一个全局数组<code>page_state_set</code>。该数组以磁盘块号为索引，用于存放换出页面的<code>PageState</code>信息，确保页面换入时能够正确恢复状态。</p>
+<h3 id="lru算法实现">LRU算法实现
+</h3><p>LRU算法的核心在于追踪页面访问模式和定期老化页面。</p>
+<p><strong>页面访问追踪</strong>通过<code>page_touch</code>函数实现。当一个页面被访问时，该函数会被调用。它首先检查页面是否被钉住，如果是则不参与LRU管理。否则，它会设置页面的<code>PG_REFERENCED</code>标志位。如果页面原先在<code>inactive_list</code>中，<code>page_touch</code>会将其移动到<code>active_list</code>的末尾，表示它最近被频繁使用。如果页面是新分配的，则会被加入<code>inactive_list</code>的末尾。</p>
+<p><strong>页面老化机制</strong>由<code>shrink_active_list</code>函数负责，该函数会定期执行（例如在调度器中）。它遍历<code>active_list</code>中的所有页面：</p>
+<ul>
+<li>如果页面的<code>PG_REFERENCED</code>标志位被设置，说明它在上一轮老化周期中被访问过。此时，函数会清除该标志位，给予它“第二次机会”，让它留在<code>active_list</code>中。</li>
+<li>如果标志位未被设置，则说明该页面近期“不活跃”，函数会将其从<code>active_list</code>移动到<code>inactive_list</code>的头部，使其成为优先被换出的候选者。</li>
+</ul>
+<h3 id="swap磁盘管理">SWAP磁盘管理
+</h3><p>使用磁盘的次IDE控制器作为SWAP分区，以避免与主文件系统冲突。访存操作对着lab5里的内容模仿即可。</p>
+<p><strong>磁盘空间分配</strong>采用位图（bitmap）来管理。为了提高分配效率，我引入了一个<code>next_free_hint</code>变量作为优化。分配函数<code>swap_block_alloc</code>会从<code>next_free_hint</code>指示的位置开始搜索空闲块，而不是每次都从头开始。找到空闲块后，更新<code>next_free_hint</code>，这大大减少了平均搜索时间。</p>
+<h3 id="页面换出实现">页面换出实现
+</h3><p>页面换出是内存紧张时的核心操作，由置换算法和具体的换出逻辑组成。</p>
+<p><strong>置换算法</strong>（<code>algo_swap</code>）负责挑选一个“受害者”页面。它的策略如下：</p>
+<ol>
+<li>优先在<code>inactive_list</code>中寻找。</li>
+<li>遍历<code>inactive_list</code>，如果一个页面未被钉住（这也算是重复检查了）且其<code>PG_REFERENCED</code>标志位为0，则它就是理想的受害者，算法直接返回该页面。</li>
+<li>如果页面的<code>PG_REFERENCED</code>标志位为1，则清除该标志位，给予其最后一次机会，然后继续查找下一个。</li>
+<li>如果遍历完<code>inactive_list</code>仍未找到合适的页面（或列表为空），则调用<code>shrink_active_list</code>将<code>active_list</code>中的不活跃页面老化到<code>inactive_list</code>中，然后重试查找。</li>
+</ol>
+<p><strong>换出操作</strong>（<code>swap_out</code>）是具体的执行者：</p>
+<ol>
+<li>调用<code>algo_swap</code>获取一个受害者页面。</li>
+<li>调用<code>swap_block_alloc</code>在磁盘上申请一个空闲块。</li>
+<li>将受害者页面的状态（引用计数、PTE链表）保存到与磁盘块号对应的<code>page_state_set</code>条目中。</li>
+<li>通过IDE接口，将受害者页面的物理内存内容写入到分配好的磁盘块中。</li>
+<li>遍历该页面的PTE链表，对每一个PTE进行修改：将其有效位（<code>PTE_V</code>）清零，设置一个自定义的<code>PTE_SWAP</code>标志位，并将物理地址部分替换为磁盘块号。同时，精确地使该PTE对应的TLB条目失效。</li>
+<li>最后，清空受害者<code>Page</code>结构体的状态，使其成为一个干净的空闲页，可以被系统重新分配。</li>
+</ol>
+<h3 id="页面换入实现">页面换入实现
+</h3><p>当程序访问一个已被换出的页面时，会触发缺页异常，最终调用<code>swap_in</code>函数。</p>
+<p><code>swap_in</code>的逻辑与<code>swap_out</code>相反：</p>
+<ol>
+<li>从触发异常的PTE中，解析出<code>PTE_SWAP</code>标志位和存储在地址部分的磁盘块号。</li>
+<li>调用<code>page_alloc</code>分配一个新的物理页面。如果此时内存不足，<code>page_alloc</code>内部可能会递归地触发一次<code>swap_out</code>。</li>
+<li>通过IDE接口，从磁盘的指定块号中将页面内容读入新分配的物理页。</li>
+<li>从<code>page_state_set</code>数组中取出该页面之前保存的状态，并恢复到新的<code>Page</code>结构体中（包括引用计数和PTE链表）。</li>
+<li>遍历恢复的PTE链表，将每个PTE重新指向新的物理页地址，并设置<code>PTE_V</code>、清除<code>PTE_SWAP</code>标志。</li>
+<li>释放磁盘上的SWAP块，并清理<code>page_state_set</code>中对应的条目。</li>
+<li>最后，调用<code>page_touch</code>将这个新换入的页面加入LRU管理体系。</li>
+</ol>
+<h3 id="tlb重填优化">TLB重填优化
+</h3><p>为了将SWAP机制集成，我修改了TLB重填处理函数<code>_do_tlb_refill</code>。当发生TLB未命中时，内核会查找对应的PTE。</p>
+<ul>
+<li>如果PTE中设置了<code>PTE_SWAP</code>标志，处理函数会立即调用<code>swap_in</code>，将页面从磁盘换回内存，并自动处理PTE的更新。</li>
+<li>在页面被确认在内存中后（无论是原本就在还是刚刚换入），调用<code>page_touch</code>来更新其在LRU链表中的位置。</li>
+<li>考虑MIPS处理器的奇偶页TLB项设计，确保成对的PTE被正确加载。</li>
+</ul>
+<p>这种设计实现了<strong>按需换入</strong>，并且将LRU状态更新与页面访问紧密结合。</p>
+<h3 id="cow机制兼容性">COW机制兼容性
+</h3><p>为了让SWAP与写时复制（COW）协同工作，我调整了<code>fork</code>中的页面复制逻辑，并在SWAP相关代码考虑COW的存在。例如，fork操作在复制一个父进程的地址空间时：</p>
+<ul>
+<li>如果一个页表项指向的页面是只读、COW页面，或者是<strong>已换出的页面</strong>（即PTE带有<code>PTE_SWAP</code>标志），那么子进程只复制这个页表项，而不分配新的物理页面。</li>
+<li>对于已换出的页面，父子进程将共享同一个指向磁盘块的PTE。当其中任何一个进程首次访问该页面时，才会触发<code>swap_in</code>，并将页面加载到内存。此时，再结合COW逻辑，将其设置为只读。</li>
+</ul>
+<h2 id="性能优化要点">性能优化要点
+</h2><p>我最后的修复是解决TLE。我在本地发现三个样例都过之后兴冲冲的去交，然后惨遭重拳，评测结果全空。</p>
+<p>经助教认证，这是典型的TLE症状。我去测了一下，我的项目此时跑完fork样例要花三分多，确实是太慢了。于是我开始做下面的优化。</p>
+<h3 id="1-tlb刷新优化">1. TLB刷新优化
+</h3><ul>
+<li>移除schedule中的全局TLB刷新</li>
+<li>仅在页面状态变化时进行精确刷新</li>
+</ul>
+<h3 id="2-磁盘访问优化">2. 磁盘访问优化
+</h3><ul>
+<li>使用hint机制加速空闲块分配</li>
+</ul>
+<h3 id="3-内存管理优化">3. 内存管理优化
+</h3><ul>
+<li>使用页面标志位快速判断状态</li>
+<li>优化链表操作减少遍历开销</li>
+</ul>
+<h2 id="大模型使用">大模型使用
+</h2><p>不建议在搭建过程中依赖大模型。大模型是强大的工具，但是前提是自己得看过并能看懂他的代码，不然省下的精力会在debug阶段通通还回去。时刻保证自己对架构有掌控力是很重要的。</p>
+<p>但是gemini还是很适合提出建议和找bug的，除了直接扔文件以外，让他帮着用命令行体验也很不错，成功帮我这个从没用过gdb的人靠看栈找到了一个关键bug。</p>
+<h2 id="感想">感想
+</h2><p>随着实验报告的完成，操作系统这门课程也正式告一段落。从lab0 extra的挫败到后面的习以为常，再到被SWAP折磨的这几个夜晚，这一切都要成为过往了。</p>
+<p>操作系统的任务全部完成之后，大二的学习内容就基本全部结束。马上就要成为一年前觉得遥不可及的大三老登了，时间过得真快。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/os-lab0-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/">
+        
+        
+            <div class="article-image">
+                <img src="/p/os-lab0-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/the-creative-exchange-d2zvqp3fpro-unsplash.60116b1ccfc8632e9a65f7d51df3efc2_hu2042364712198079406.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post OS-lab0 实验报告"
+                        
+                        data-hash="md5-YBFrHM/IYy6aZffVHfPvwg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">OS-lab0 实验报告</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 Messmerr
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.27.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

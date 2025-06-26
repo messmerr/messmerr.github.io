@@ -7,7 +7,119 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>Messmerr</copyright>
-        <lastBuildDate>Mon, 10 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://messmerr.github.io/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 26 Jun 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://messmerr.github.io/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>OS-SWAP 实验报告</title>
+        <link>https://messmerr.github.io/p/os-swap-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link>
+        <pubDate>Thu, 26 Jun 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://messmerr.github.io/p/os-swap-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</guid>
+        <description>&lt;img src="https://messmerr.github.io/p/os-swap-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/domenico-loia-hGV2TfOh0ns-unsplash.jpg" alt="Featured image of post OS-SWAP 实验报告" /&gt;&lt;hr&gt;
+&lt;h1 id=&#34;os-swap-实验报告&#34;&gt;OS-SWAP 实验报告
+&lt;/h1&gt;&lt;h2 id=&#34;前言&#34;&gt;前言
+&lt;/h2&gt;&lt;p&gt;个人感觉SWAP相比Shell来说要不友好一些，因为很难有循序渐进的正反馈，做题的大部分时间都在对着各种报错痛苦地干瞪眼。本次任务我分了两段时间做，一次是考军理之前，花了两天整的时间企图给他速通掉，结果最后被一个顽固的bug击败，选择先复习。然后是24号考完马原之后又做了一天半，最后才完成。&lt;/p&gt;
+&lt;p&gt;题目要求基于自己的lab6进行迭代，实现一套页面置换（SWAP）机制。该实现采用Linux风格的LRU（Least Recently Used）算法，通过维护active_list和inactive_list两个双向链表来管理物理页面的访问频率，并在物理内存不足时将页面换出到磁盘，在访问时自动换入。&lt;/p&gt;
+&lt;h2 id=&#34;题目分解&#34;&gt;题目分解
+&lt;/h2&gt;&lt;h3 id=&#34;工作内容&#34;&gt;工作内容
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;LRU算法实现&lt;/strong&gt;：正确维护active_list和inactive_list双向链表，跟踪页面访问模式&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SWAP操作&lt;/strong&gt;：为内核创建访问磁盘的接口，实现swap_out和swap_in操作，管理磁盘存储&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;COW兼容性&lt;/strong&gt;：确保SWAP机制与Copy-On-Write机制正确协作&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;性能优化&lt;/strong&gt;：避免频繁的TLB刷新，优化磁盘访问&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;一些注意事项&#34;&gt;一些注意事项
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;MIPS R4K没有硬件访问位，需要通过软件TLB重填模拟。记得考虑奇偶页的问题。&lt;/li&gt;
+&lt;li&gt;页表项需要同时支持COW、SWAP等多种状态&lt;/li&gt;
+&lt;li&gt;注意换出页面的状态保存和恢复&lt;/li&gt;
+&lt;li&gt;确保系统稳定性，避免页表等关键页面被换出&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;具体实现&#34;&gt;具体实现
+&lt;/h2&gt;&lt;h3 id=&#34;数据结构扩展&#34;&gt;数据结构扩展
+&lt;/h3&gt;&lt;p&gt;为了支持功能，我对核心数据结构进行了扩展。&lt;/p&gt;
+&lt;p&gt;首先，扩展了&lt;code&gt;Page&lt;/code&gt;结构体。这部分基本按照题目来就好，例如新增页面标志位（&lt;code&gt;pp_flags&lt;/code&gt;），其中我使用的有&lt;code&gt;PG_REFERENCED&lt;/code&gt;用于标记页面近期是否被访问，&lt;code&gt;PG_PINNED&lt;/code&gt;用于“钉住”关键页面防止被换出，以及后期做性能优化的时候我临时追加了&lt;code&gt;PG_ACTIVE&lt;/code&gt;和&lt;code&gt;PG_INACTIVE&lt;/code&gt;用于标识页面当前所在的LRU链表，避免每次都遍历。&lt;/p&gt;
+&lt;p&gt;同时，为了在换出页面时能找到所有指向它的页表项（PTE），每个&lt;code&gt;Page&lt;/code&gt;结构体维护一个&lt;code&gt;Pte_list&lt;/code&gt;链表，链表中的每个节点&lt;code&gt;PteNode&lt;/code&gt;都包含一个指向PTE的指针、该PTE对应的虚拟地址以及地址空间ID（ASID）。这样，当一个物理页需要被换出时，可以遍历这个链表，修改所有相关的PTE。&lt;/p&gt;
+&lt;p&gt;此外，当一个页面被换出到磁盘后，其在&lt;code&gt;Page&lt;/code&gt;结构体中保存的状态（如引用计数&lt;code&gt;pp_ref&lt;/code&gt;和页表项链表&lt;code&gt;pp_pte_list&lt;/code&gt;）需要被保留。为此，我也是用了题目推荐的状态管理结构&lt;code&gt;PageState&lt;/code&gt;，并创建了一个全局数组&lt;code&gt;page_state_set&lt;/code&gt;。该数组以磁盘块号为索引，用于存放换出页面的&lt;code&gt;PageState&lt;/code&gt;信息，确保页面换入时能够正确恢复状态。&lt;/p&gt;
+&lt;h3 id=&#34;lru算法实现&#34;&gt;LRU算法实现
+&lt;/h3&gt;&lt;p&gt;LRU算法的核心在于追踪页面访问模式和定期老化页面。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;页面访问追踪&lt;/strong&gt;通过&lt;code&gt;page_touch&lt;/code&gt;函数实现。当一个页面被访问时，该函数会被调用。它首先检查页面是否被钉住，如果是则不参与LRU管理。否则，它会设置页面的&lt;code&gt;PG_REFERENCED&lt;/code&gt;标志位。如果页面原先在&lt;code&gt;inactive_list&lt;/code&gt;中，&lt;code&gt;page_touch&lt;/code&gt;会将其移动到&lt;code&gt;active_list&lt;/code&gt;的末尾，表示它最近被频繁使用。如果页面是新分配的，则会被加入&lt;code&gt;inactive_list&lt;/code&gt;的末尾。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;页面老化机制&lt;/strong&gt;由&lt;code&gt;shrink_active_list&lt;/code&gt;函数负责，该函数会定期执行（例如在调度器中）。它遍历&lt;code&gt;active_list&lt;/code&gt;中的所有页面：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果页面的&lt;code&gt;PG_REFERENCED&lt;/code&gt;标志位被设置，说明它在上一轮老化周期中被访问过。此时，函数会清除该标志位，给予它“第二次机会”，让它留在&lt;code&gt;active_list&lt;/code&gt;中。&lt;/li&gt;
+&lt;li&gt;如果标志位未被设置，则说明该页面近期“不活跃”，函数会将其从&lt;code&gt;active_list&lt;/code&gt;移动到&lt;code&gt;inactive_list&lt;/code&gt;的头部，使其成为优先被换出的候选者。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;swap磁盘管理&#34;&gt;SWAP磁盘管理
+&lt;/h3&gt;&lt;p&gt;使用磁盘的次IDE控制器作为SWAP分区，以避免与主文件系统冲突。访存操作对着lab5里的内容模仿即可。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;磁盘空间分配&lt;/strong&gt;采用位图（bitmap）来管理。为了提高分配效率，我引入了一个&lt;code&gt;next_free_hint&lt;/code&gt;变量作为优化。分配函数&lt;code&gt;swap_block_alloc&lt;/code&gt;会从&lt;code&gt;next_free_hint&lt;/code&gt;指示的位置开始搜索空闲块，而不是每次都从头开始。找到空闲块后，更新&lt;code&gt;next_free_hint&lt;/code&gt;，这大大减少了平均搜索时间。&lt;/p&gt;
+&lt;h3 id=&#34;页面换出实现&#34;&gt;页面换出实现
+&lt;/h3&gt;&lt;p&gt;页面换出是内存紧张时的核心操作，由置换算法和具体的换出逻辑组成。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;置换算法&lt;/strong&gt;（&lt;code&gt;algo_swap&lt;/code&gt;）负责挑选一个“受害者”页面。它的策略如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;优先在&lt;code&gt;inactive_list&lt;/code&gt;中寻找。&lt;/li&gt;
+&lt;li&gt;遍历&lt;code&gt;inactive_list&lt;/code&gt;，如果一个页面未被钉住（这也算是重复检查了）且其&lt;code&gt;PG_REFERENCED&lt;/code&gt;标志位为0，则它就是理想的受害者，算法直接返回该页面。&lt;/li&gt;
+&lt;li&gt;如果页面的&lt;code&gt;PG_REFERENCED&lt;/code&gt;标志位为1，则清除该标志位，给予其最后一次机会，然后继续查找下一个。&lt;/li&gt;
+&lt;li&gt;如果遍历完&lt;code&gt;inactive_list&lt;/code&gt;仍未找到合适的页面（或列表为空），则调用&lt;code&gt;shrink_active_list&lt;/code&gt;将&lt;code&gt;active_list&lt;/code&gt;中的不活跃页面老化到&lt;code&gt;inactive_list&lt;/code&gt;中，然后重试查找。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;换出操作&lt;/strong&gt;（&lt;code&gt;swap_out&lt;/code&gt;）是具体的执行者：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;调用&lt;code&gt;algo_swap&lt;/code&gt;获取一个受害者页面。&lt;/li&gt;
+&lt;li&gt;调用&lt;code&gt;swap_block_alloc&lt;/code&gt;在磁盘上申请一个空闲块。&lt;/li&gt;
+&lt;li&gt;将受害者页面的状态（引用计数、PTE链表）保存到与磁盘块号对应的&lt;code&gt;page_state_set&lt;/code&gt;条目中。&lt;/li&gt;
+&lt;li&gt;通过IDE接口，将受害者页面的物理内存内容写入到分配好的磁盘块中。&lt;/li&gt;
+&lt;li&gt;遍历该页面的PTE链表，对每一个PTE进行修改：将其有效位（&lt;code&gt;PTE_V&lt;/code&gt;）清零，设置一个自定义的&lt;code&gt;PTE_SWAP&lt;/code&gt;标志位，并将物理地址部分替换为磁盘块号。同时，精确地使该PTE对应的TLB条目失效。&lt;/li&gt;
+&lt;li&gt;最后，清空受害者&lt;code&gt;Page&lt;/code&gt;结构体的状态，使其成为一个干净的空闲页，可以被系统重新分配。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;页面换入实现&#34;&gt;页面换入实现
+&lt;/h3&gt;&lt;p&gt;当程序访问一个已被换出的页面时，会触发缺页异常，最终调用&lt;code&gt;swap_in&lt;/code&gt;函数。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;swap_in&lt;/code&gt;的逻辑与&lt;code&gt;swap_out&lt;/code&gt;相反：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;从触发异常的PTE中，解析出&lt;code&gt;PTE_SWAP&lt;/code&gt;标志位和存储在地址部分的磁盘块号。&lt;/li&gt;
+&lt;li&gt;调用&lt;code&gt;page_alloc&lt;/code&gt;分配一个新的物理页面。如果此时内存不足，&lt;code&gt;page_alloc&lt;/code&gt;内部可能会递归地触发一次&lt;code&gt;swap_out&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;通过IDE接口，从磁盘的指定块号中将页面内容读入新分配的物理页。&lt;/li&gt;
+&lt;li&gt;从&lt;code&gt;page_state_set&lt;/code&gt;数组中取出该页面之前保存的状态，并恢复到新的&lt;code&gt;Page&lt;/code&gt;结构体中（包括引用计数和PTE链表）。&lt;/li&gt;
+&lt;li&gt;遍历恢复的PTE链表，将每个PTE重新指向新的物理页地址，并设置&lt;code&gt;PTE_V&lt;/code&gt;、清除&lt;code&gt;PTE_SWAP&lt;/code&gt;标志。&lt;/li&gt;
+&lt;li&gt;释放磁盘上的SWAP块，并清理&lt;code&gt;page_state_set&lt;/code&gt;中对应的条目。&lt;/li&gt;
+&lt;li&gt;最后，调用&lt;code&gt;page_touch&lt;/code&gt;将这个新换入的页面加入LRU管理体系。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;tlb重填优化&#34;&gt;TLB重填优化
+&lt;/h3&gt;&lt;p&gt;为了将SWAP机制集成，我修改了TLB重填处理函数&lt;code&gt;_do_tlb_refill&lt;/code&gt;。当发生TLB未命中时，内核会查找对应的PTE。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果PTE中设置了&lt;code&gt;PTE_SWAP&lt;/code&gt;标志，处理函数会立即调用&lt;code&gt;swap_in&lt;/code&gt;，将页面从磁盘换回内存，并自动处理PTE的更新。&lt;/li&gt;
+&lt;li&gt;在页面被确认在内存中后（无论是原本就在还是刚刚换入），调用&lt;code&gt;page_touch&lt;/code&gt;来更新其在LRU链表中的位置。&lt;/li&gt;
+&lt;li&gt;考虑MIPS处理器的奇偶页TLB项设计，确保成对的PTE被正确加载。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这种设计实现了&lt;strong&gt;按需换入&lt;/strong&gt;，并且将LRU状态更新与页面访问紧密结合。&lt;/p&gt;
+&lt;h3 id=&#34;cow机制兼容性&#34;&gt;COW机制兼容性
+&lt;/h3&gt;&lt;p&gt;为了让SWAP与写时复制（COW）协同工作，我调整了&lt;code&gt;fork&lt;/code&gt;中的页面复制逻辑，并在SWAP相关代码考虑COW的存在。例如，fork操作在复制一个父进程的地址空间时：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果一个页表项指向的页面是只读、COW页面，或者是&lt;strong&gt;已换出的页面&lt;/strong&gt;（即PTE带有&lt;code&gt;PTE_SWAP&lt;/code&gt;标志），那么子进程只复制这个页表项，而不分配新的物理页面。&lt;/li&gt;
+&lt;li&gt;对于已换出的页面，父子进程将共享同一个指向磁盘块的PTE。当其中任何一个进程首次访问该页面时，才会触发&lt;code&gt;swap_in&lt;/code&gt;，并将页面加载到内存。此时，再结合COW逻辑，将其设置为只读。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;性能优化要点&#34;&gt;性能优化要点
+&lt;/h2&gt;&lt;p&gt;我最后的修复是解决TLE。我在本地发现三个样例都过之后兴冲冲的去交，然后惨遭重拳，评测结果全空。&lt;/p&gt;
+&lt;p&gt;经助教认证，这是典型的TLE症状。我去测了一下，我的项目此时跑完fork样例要花三分多，确实是太慢了。于是我开始做下面的优化。&lt;/p&gt;
+&lt;h3 id=&#34;1-tlb刷新优化&#34;&gt;1. TLB刷新优化
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;移除schedule中的全局TLB刷新&lt;/li&gt;
+&lt;li&gt;仅在页面状态变化时进行精确刷新&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2-磁盘访问优化&#34;&gt;2. 磁盘访问优化
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;使用hint机制加速空闲块分配&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;3-内存管理优化&#34;&gt;3. 内存管理优化
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;使用页面标志位快速判断状态&lt;/li&gt;
+&lt;li&gt;优化链表操作减少遍历开销&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;大模型使用&#34;&gt;大模型使用
+&lt;/h2&gt;&lt;p&gt;不建议在搭建过程中依赖大模型。大模型是强大的工具，但是前提是自己得看过并能看懂他的代码，不然省下的精力会在debug阶段通通还回去。时刻保证自己对架构有掌控力是很重要的。&lt;/p&gt;
+&lt;p&gt;但是gemini还是很适合提出建议和找bug的，除了直接扔文件以外，让他帮着用命令行体验也很不错，成功帮我这个从没用过gdb的人靠看栈找到了一个关键bug。&lt;/p&gt;
+&lt;h2 id=&#34;感想&#34;&gt;感想
+&lt;/h2&gt;&lt;p&gt;随着实验报告的完成，操作系统这门课程也正式告一段落。从lab0 extra的挫败到后面的习以为常，再到被SWAP折磨的这几个夜晚，这一切都要成为过往了。&lt;/p&gt;
+&lt;p&gt;操作系统的任务全部完成之后，大二的学习内容就基本全部结束。马上就要成为一年前觉得遥不可及的大三老登了，时间过得真快。&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>OS-lab0 实验报告</title>
         <link>https://messmerr.github.io/p/os-lab0-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</link>
         <pubDate>Mon, 10 Mar 2025 00:00:00 +0000</pubDate>
